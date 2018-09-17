@@ -3,7 +3,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 from django.core.management.base import BaseCommand
 
 import arrow
-import jaws
 import rollbar
 
 from ... import constants, models
@@ -16,9 +15,6 @@ class Command(BaseCommand):
         parser.add_argument('--minutes', type=int)
 
     def handle(self, *args, **options):
-        if not jaws.open('enable-atomiq-consumer', False):
-            return
-
         try:
             minutes = options['minutes']
             if minutes:
