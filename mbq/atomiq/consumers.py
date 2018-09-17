@@ -1,7 +1,7 @@
 import importlib
 import json
-from time import sleep
 import traceback
+from time import sleep
 
 from django.db import transaction
 

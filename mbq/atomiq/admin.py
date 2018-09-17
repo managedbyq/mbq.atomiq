@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 import arrow
 
-from . import models, constants
+from . import constants, models
 
 
 def delete_tasks(modeladmin, request, queryset):
