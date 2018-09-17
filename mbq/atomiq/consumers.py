@@ -56,25 +56,26 @@ class BaseConsumer(object):
         dd_tags = {
             'end_state': task.state,
             'result': 'success' if task.state == constants.TaskStates.SUCCEEDED else 'error',
+            'queue_type': self.queue_type,
         }
         _collector.increment(
-            '{}.task'.format(self.metrics_prefix),
+            'task',
             tags=dd_tags,
         )
 
         _collector.timing(
-            '{}.task.wait_time_ms'.format(self.metrics_prefix),
+            'task.wait_time_ms',
             utils.time_difference_ms(task.visible_after, execution_started_at),
             tags=dd_tags,
         )
         _collector.timing(
-            '{}.task.execution_time_ms'.format(self.metrics_prefix),
+            'task.execution_time_ms',
             utils.time_difference_ms(execution_started_at, execution_ended_at),
             tags=dd_tags,
         )
         if task.state == constants.TaskStates.SUCCEEDED:
             _collector.timing(
-                '{}.task.turnaround_time_ms'.format(self.metrics_prefix),
+                'task.turnaround_time_ms',
                 utils.time_difference_ms(task.created_at, task.succeeded_at),
                 tags=dd_tags,
             )
@@ -86,15 +87,15 @@ class BaseConsumer(object):
         for state in constants.TaskStates.CHOICES:
             state = state[0]
             _collector.gauge(
-                '{}.state_total'.format(self.metrics_prefix),
+                'state_total',
                 self.model.objects.filter(state=state).count(),
-                tags={'state': state},
+                tags={'state': state, 'queue_type': self.queue_type},
             )
 
 
 class SNSConsumer(BaseConsumer):
     model = models.SNSTask
-    metrics_prefix = 'sns'
+    queue_type = 'sns'
     sns_client = None
 
     def __init__(self):
@@ -113,7 +114,7 @@ class SNSConsumer(BaseConsumer):
 
 class SQSConsumer(BaseConsumer):
     model = models.SQSTask
-    metrics_prefix = 'sqs'
+    queue_type = 'sqs'
     sqs_client = None
 
     def __init__(self):
@@ -131,7 +132,7 @@ class SQSConsumer(BaseConsumer):
 
 class CeleryConsumer(BaseConsumer):
     model = models.CeleryTask
-    metrics_prefix = 'celery'
+    queue_type = 'celery'
     celery_app = None
 
     def __init__(self, celery_app):
