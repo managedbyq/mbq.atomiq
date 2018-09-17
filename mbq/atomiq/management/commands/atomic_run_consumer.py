@@ -5,9 +5,9 @@ from time import sleep
 
 from django.core.management.base import BaseCommand
 
+import jaws
 import rollbar
 
-import jaws
 from ... import consumers
 
 
