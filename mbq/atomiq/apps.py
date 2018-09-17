@@ -6,8 +6,6 @@ class AtomiqConfig(AppConfig):
     verbose_name = 'Atomiq'
 
     def ready(self):
-        super(Config, self).ready()
-
         from django.conf import settings
         from django.core.exceptions import ImproperlyConfigured
         import mbq.metrics
