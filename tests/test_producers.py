@@ -4,10 +4,9 @@ from django.db import transaction
 from django.test import SimpleTestCase, TestCase
 
 import arrow
-from tests.compat import mock
-
 import mbq.atomiq
 from mbq.atomiq import constants, exceptions, models, producers
+from tests.compat import mock
 
 
 class TransactionCheckTest(SimpleTestCase):

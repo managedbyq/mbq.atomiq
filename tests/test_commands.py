@@ -3,9 +3,8 @@ from django.test import TestCase
 
 import arrow
 import freezegun
-from tests.compat import mock
-
 from mbq.atomiq import constants, models
+from tests.compat import mock
 
 
 @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.should_continue',

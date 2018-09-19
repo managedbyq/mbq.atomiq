@@ -1,7 +1,6 @@
 from django.test import TestCase
 
 import arrow
-
 from mbq.atomiq import utils
 
 

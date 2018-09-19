@@ -2,7 +2,6 @@ import os
 
 import boto3
 import dj_database_url
-
 import mbq.metrics
 
 

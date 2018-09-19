@@ -4,11 +4,10 @@ from django.core.management import call_command
 from django.db import transaction
 from django.test import TestCase
 
+import mbq.atomiq
+from tests.celery import celery_app
 from tests.compat import mock
 
-import mbq.atomiq
-
-from tests.celery import celery_app
 
 class ProcessTasksTest(TestCase):
 
