@@ -1,8 +1,5 @@
-arrow
 boto
 boto3
-celery==4.0.2
+celery<5.0
 dj-database-url
-jsonfield==1.0.3
-mbq.metrics==0.4.1
-rollbar
+freezegun

@@ -1,6 +1,8 @@
 import os
 
+import boto3
 import dj_database_url
+import mbq.metrics
 
 
 SECRET_KEY = 'fake-key'
@@ -18,3 +20,11 @@ DATABASES = {
 INSTALLED_APPS = [
     'mbq.atomiq',
 ]
+
+USE_TZ = True
+
+boto3.setup_default_session(
+    region_name='us-east-1',
+)
+
+mbq.metrics.init()

@@ -6,7 +6,7 @@ services:
     build:
       context: .
       args:
-        IMAGE: 'python:2.7'
+        IMAGE: 'python:2.7-stretch'
     volumes:
       - .:/app
     links:
@@ -19,7 +19,7 @@ services:
     build:
       context: .
       args:
-        IMAGE: 'python:3.6'
+        IMAGE: 'python:3.6-stretch'
     volumes:
       - .:/app
     links:
@@ -32,7 +32,7 @@ services:
     build:
       context: .
       args:
-        IMAGE: 'python:3.7'
+        IMAGE: 'python:3.7-stretch'
     volumes:
       - .:/app
     links:
@@ -45,7 +45,7 @@ services:
     build:
       context: .
       args:
-        IMAGE: 'pypy:3-6.0'
+        IMAGE: 'pypy:3-6-jessie'
     volumes:
       - .:/app
     links:
