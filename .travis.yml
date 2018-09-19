@@ -12,10 +12,13 @@ python:
   - 'pypy3'
 
 env:
-  - DJANGO=1.11
-  - DJANGO=2.0
-  - DJANGO=2.1
-  - DJANGO=master
+  matrix:
+    - DJANGO=1.11
+    - DJANGO=2.0
+    - DJANGO=2.1
+    - DJANGO=master
+  global:
+    - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
 
 matrix:
   include:
