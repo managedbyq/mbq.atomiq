@@ -5,5 +5,4 @@ celery==4.0.2
 dj-database-url
 jsonfield==1.0.3
 mbq.metrics==0.4.1
-mysqlclient==1.3.6
 rollbar
