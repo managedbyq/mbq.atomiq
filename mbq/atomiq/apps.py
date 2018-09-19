@@ -2,7 +2,7 @@ from django.apps import AppConfig
 
 
 class AtomiqConfig(AppConfig):
-    name = 'atomiq'
+    name = 'mbq.atomiq'
     verbose_name = 'Atomiq'
 
     def ready(self):

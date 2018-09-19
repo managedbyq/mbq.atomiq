@@ -1,11 +1,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import signal
-from time import sleep
 
 from django.core.management.base import BaseCommand
 
-import jaws
 import rollbar
 
 from ... import consumers
@@ -43,11 +41,8 @@ class Command(BaseCommand):
             signal.signal(signal.SIGQUIT, signal_handler)
 
             while should_continue():
-                if jaws.open('enable-atomiq-consumer', False):
-                    consumer.collect_queue_metrics()
-                    consumer.run()
-                else:
-                    sleep(10)
+                consumer.collect_queue_metrics()
+                consumer.run()
 
         except Exception:
             rollbar.report_exc_info()

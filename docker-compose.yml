@@ -1,0 +1,63 @@
+---
+version: '3'
+
+services:
+  py27:
+    build:
+      context: .
+      args:
+        IMAGE: 'python:2.7'
+    volumes:
+      - .:/app
+    links:
+      - mysql
+    environment:
+      TOX_WORK_DIR: /tox
+      PYTHON_VERSION: py27
+
+  py36:
+    build:
+      context: .
+      args:
+        IMAGE: 'python:3.6'
+    volumes:
+      - .:/app
+    links:
+      - mysql
+    environment:
+      TOX_WORK_DIR: /tox
+      PYTHON_VERSION: py36
+
+  py37:
+    build:
+      context: .
+      args:
+        IMAGE: 'python:3.7'
+    volumes:
+      - .:/app
+    links:
+      - mysql
+    environment:
+      TOX_WORK_DIR: /tox
+      PYTHON_VERSION: py37
+
+  pypy3:
+    build:
+      context: .
+      args:
+        IMAGE: 'pypy:3-6.0'
+    volumes:
+      - .:/app
+    links:
+      - mysql
+    environment:
+      TOX_WORK_DIR: /tox
+      PYTHON_VERSION: pypy3
+
+  mysql:
+    image: mysql:5.6
+    environment:
+      - MYSQL_DATABASE=atomiqdb
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+
+
