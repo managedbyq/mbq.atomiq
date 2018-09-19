@@ -1,5 +1,5 @@
 boto
 boto3
-celery==4.0.2
+celery<5.0
 dj-database-url
 freezegun
