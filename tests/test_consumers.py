@@ -210,7 +210,7 @@ class RunConsumerTest(TestCase):
         )
         process_task.side_effect = Exception
         self.consumer.run()
-        sleep.assert_called_once()
+        self.assertEquals(sleep.call_count, 1)
 
 
 @mock.patch('mbq.atomiq.consumers.SNSConsumer.publish')

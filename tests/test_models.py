@@ -10,9 +10,12 @@ class TaskTest(TestCase):
 
     @freezegun.freeze_time()
     def test_available_for_processing_queryset(self):
-        task_succeeded = SNSTask.objects.create(state=TaskStates.SUCCEEDED)
-        task_failed = SNSTask.objects.create(state=TaskStates.FAILED)
-        task_deleted = SNSTask.objects.create(state=TaskStates.DELETED)
+        # successfull task
+        SNSTask.objects.create(state=TaskStates.SUCCEEDED)
+        # failed task
+        SNSTask.objects.create(state=TaskStates.FAILED)
+        # deleted task
+        SNSTask.objects.create(state=TaskStates.DELETED)
 
         task_ready = SNSTask.objects.create(state=TaskStates.ENQUEUED)
         task_ready_past = SNSTask.objects.create(
@@ -23,7 +26,8 @@ class TaskTest(TestCase):
             state=TaskStates.ENQUEUED,
             visible_after=arrow.utcnow().datetime,
         )
-        task_ready_future = SNSTask.objects.create(
+        # future task
+        SNSTask.objects.create(
             state=TaskStates.ENQUEUED,
             visible_after=arrow.utcnow().shift(seconds=1).datetime,
         )
