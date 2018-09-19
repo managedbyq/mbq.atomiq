@@ -1,12 +1,10 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 import signal
 
 from django.core.management.base import BaseCommand
 
 import rollbar
 
-from ... import consumers
+from mbq.atomiq import consumers
 
 
 INTERRUPTED_BY_SIGNAL = False

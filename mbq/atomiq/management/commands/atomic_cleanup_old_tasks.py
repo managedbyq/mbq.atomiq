@@ -1,11 +1,9 @@
-from __future__ import absolute_import, print_function, unicode_literals
-
 from django.core.management.base import BaseCommand
 
 import arrow
 import rollbar
 
-from ... import constants, models
+from mbq.atomiq import constants, models
 
 
 class Command(BaseCommand):

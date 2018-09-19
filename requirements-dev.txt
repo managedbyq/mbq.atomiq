@@ -3,3 +3,4 @@ boto3
 celery<5.0
 dj-database-url
 freezegun
+rollbar
