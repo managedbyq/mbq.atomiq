@@ -1,4 +1,4 @@
 arrow
 jsonfield==1.0.3
-mbq.metrics==0.4.1
+mbq.metrics
 rollbar
