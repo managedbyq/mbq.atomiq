@@ -1,4 +1,3 @@
 arrow
 jsonfield
 mbq.metrics
-rollbar

@@ -39,5 +39,10 @@ setuptools.setup(
     ],
     keywords='',
     packages=setuptools.find_packages(),
+    install_requires=[
+        'arrow',
+        'jsonfield',
+        'mbq.metrics',
+    ],
     zip_safe=True,
 )
