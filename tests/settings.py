@@ -1,8 +1,9 @@
 import os
 
+import mbq.metrics
+
 import boto3
 import dj_database_url
-import mbq.metrics
 
 
 SECRET_KEY = 'fake-key'

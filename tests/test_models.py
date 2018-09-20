@@ -1,9 +1,10 @@
 from django.test import TestCase
 
 import arrow
-import freezegun
 from mbq.atomiq.constants import TaskStates
 from mbq.atomiq.models import SNSTask
+
+import freezegun
 
 
 class TaskTest(TestCase):

@@ -2,9 +2,10 @@ from django.core.management import call_command
 from django.test import TestCase
 
 import arrow
-import freezegun
 from mbq.atomiq import constants, models
 from tests.compat import mock
+
+import freezegun
 
 
 @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.should_continue',
