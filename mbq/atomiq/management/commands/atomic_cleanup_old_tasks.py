@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand
 import arrow
 import rollbar
 
-from mbq.atomiq import constants, models
+from ... import constants, models
 
 
 class Command(BaseCommand):

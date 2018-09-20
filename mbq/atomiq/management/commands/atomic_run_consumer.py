@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 import rollbar
 
-from mbq.atomiq import consumers
+from ... import consumers
 
 
 INTERRUPTED_BY_SIGNAL = False
