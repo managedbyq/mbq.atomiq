@@ -50,7 +50,7 @@ deploy:
   password:
     secure: Njp4BJ/ZafuvyZmbbZf1p/gtwkBku2WWscdaPAbEsoITWxX0Qt/5/RQQZDjn+pCU+oABac7xrWbiDvcAvFB5Z4Lnf3ejggYd8y0Z8vC79mdj2721voXUg1M8NtUQfL+vE6kVGWlc1YLR/nCK8q/X6zTjQudE47UUBu9lXMnVHgq4c2mEtusSLM2dk6eVuNZ13gQz+uoZY+KPurRNL2spCAPA4hLCimE9jqswqqmTWJY8BA4II3wDi+X7pPdZglAMlDgTdju1vAZBdLWB0+wRXA5AcNYw7px7+oLGTUZ+dYGq7/VIE0Txy25e+z/qxBGmZs+CM4q35ClVQn0VL5EvYrPciQYSQUy8xTsoFavdS0QGDVTDSJElmwXE/vCY/HWqeE/t1rVQlUCAyJ9vRyEVGGyU4PRrJ6+GchaLcC9qeMI4O1T+JNHhsi3tOSWti2VFQsdbnt+N+A0x7lRj8vNpPgblpyeQjiNNvV37juhL9LQVH5GyStr/lDqczQ2JSvjOtYIasu12DMa2Z2S298zEPrXNZTics7etSDkkLYIJrrXp70Wayq0HV19l+CYKBIvUdOBAP483uG8xos2PME7o3LvrD4gCMhCK0YiyUtoHP0Eejj2ZTk49kDSM3117rOwJUNtCT+MIxRZTO/X4uRRLoYOjCoojJfnBq8FWwyNDErI=
   on:
-    repo: managedbyq/mbq.metrics
+    repo: managedbyq/mbq.atomiq
     branch: master
     tags: true
     python: '3.6'
