@@ -68,7 +68,7 @@ To make sure we're not holding on to successfully executed or deleted tasks we a
 
 Monitoring
 ----------
-(Datadog Dahsboard)[https://app.datadoghq.com/dash/895710/atomiq?live=true&page=0&is_auto=false&tile_size=l&tpl_var_queue=*]
+[Datadog Dahsboard](https://app.datadoghq.com/dash/895710/atomiq?live=true&page=0&is_auto=false&tile_size=l&tpl_var_queue=*)
 
 
 Testing
