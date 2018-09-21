@@ -23,8 +23,11 @@ Installation
 
 Getting started
 ---------------
+
 1. Add `mbq.atomiq` to `INSTALLED_APPS` in your django application's settings
+
 2. Add `ATOMIQ` specific settings to that same settings file. Those are used for metrics.
+
 .. code-block:: python
 
     ATOMIQ = {
@@ -33,7 +36,9 @@ Getting started
     }
 
 3. Set up consumers for each queue type that your app needs. `mbq.atomiq` provides a handy management command for that:
+
 .. code-block:: bash
+
     python -m manage atomic_run_consumer --queue sns
 
     python -m manage atomic_run_consumer --queue sqs
@@ -41,11 +46,15 @@ Getting started
     python -m manage atomic_run_consumer --queue celery --celery-app path.to.celery.app
 
 notice that celery consumer requires an additional arg `celery-app`. This should be a module path to the file that instantializes celery app like so:
+
 .. code-block:: python
+
     celery_app = Celery(NAME)
 
 To make sure we're not holding on to successfully executed or deleted tasks we also have a clean up management command, that by default will clean up all processed tasks that are older than 30 days. That default can be overriden.
+
 .. code-block:: bash
+
     python -m manage atomic_cleanup_old_tasks
 
     or
@@ -57,7 +66,9 @@ To make sure we're not holding on to successfully executed or deleted tasks we a
     python -m manage atomic_cleanup_old_tasks --minutes N
 
 4. Use it!
+
 .. code-block:: python
+
     import mbq.atomiq
 
     mbq.atomiq.sns_publish(topic_arn, message)
@@ -68,20 +79,21 @@ To make sure we're not holding on to successfully executed or deleted tasks we a
 
 Monitoring
 ----------
-[Datadog Dahsboard](https://app.datadoghq.com/dash/895710/atomiq?live=true&page=0&is_auto=false&tile_size=l&tpl_var_queue=*)
+<https://app.datadoghq.com/dash/895710/atomiq>
 
 
 Testing
 -------
-Tests are automatically in `Travis CI https://travis-ci.org/managedbyq/mbq.metrics` but you can also run tests locally using `docker-compose`.
-We now use `tox` for local testing across multiple python environments. Before this use `pyenv` to install the following python interpreters: cpython{2.7, 3.5, 3.6} and pypy3
+Tests are automatically in ``Travis CI https://travis-ci.org/managedbyq/mbq.metrics`` but you can also run tests locally using ``docker-compose``.
+We now use `tox` for local testing across multiple python environments. Before this use ``pyenv`` to install the following python interpreters: cpython{2.7, 3.5, 3.6} and pypy3
 
 .. code-block:: bash
+
     $ docker-compose up py36|py27|py37|pypy3
 
 
 Shipping a New Release
 ----------------------
-1. Bump the version in `__version__.py`
-2. Go to `Releases` in GitHub and "Draft a New Release"
+1. Bump the version in ``__version__.py``
+2. Go to ``Releases`` in GitHub and "Draft a New Release"
 3. After creating a new release, Travis CI will pick up the new release and ship it to PyPi
