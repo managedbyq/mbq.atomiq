@@ -84,7 +84,7 @@ Monitoring
 
 Testing
 -------
-Tests are automatically in ``Travis CI https://travis-ci.org/managedbyq/mbq.metrics`` but you can also run tests locally using ``docker-compose``.
+Tests are automatically in ``Travis CI https://travis-ci.org/managedbyq/mbq.atomiq`` but you can also run tests locally using ``docker-compose``.
 We now use `tox` for local testing across multiple python environments. Before this use ``pyenv`` to install the following python interpreters: cpython{2.7, 3.5, 3.6} and pypy3
 
 .. code-block:: bash
