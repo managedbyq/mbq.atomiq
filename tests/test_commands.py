@@ -8,24 +8,26 @@ from tests.compat import mock
 import freezegun
 
 
-@mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.should_continue',
-            side_effect=[True, False])
+@mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler')
 class RunConsumerCommandTest(TestCase):
 
     @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.consumers.SNSConsumer.run')
-    def test_run_consumer_sns(self, run, *args):
+    def test_run_consumer_sns(self, run, SignalHandlerMock):
+        SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
         call_command('atomic_run_consumer', '--queue=sns')
-        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_count, 2)
 
     @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.consumers.SQSConsumer.run')
-    def test_run_consumer_sqs(self, run, *args):
+    def test_run_consumer_sqs(self, run, SignalHandlerMock):
+        SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
         call_command('atomic_run_consumer', '--queue=sqs')
-        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_count, 2)
 
     @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.consumers.CeleryConsumer.run')
-    def test_run_consumer_celery(self, run, *args):
+    def test_run_consumer_celery(self, run, SignalHandlerMock):
+        SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
         call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
-        self.assertEqual(run.call_count, 1)
+        self.assertEqual(run.call_count, 2)
 
 
 @mock.patch('mbq.atomiq.constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS', 30)

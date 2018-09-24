@@ -7,19 +7,28 @@ import rollbar
 from ... import consumers
 
 
-INTERRUPTED_BY_SIGNAL = False
+class SignalHandler():
 
+    def __init__(self):
+        self._interrupted = False
 
-def signal_handler(signal, frame):
-    global INTERRUPTED_BY_SIGNAL
-    INTERRUPTED_BY_SIGNAL = True
+    def handle_signal(self, *args, **kwargs):
+        self._interrupted = True
 
-
-def should_continue():
-    return not INTERRUPTED_BY_SIGNAL
+    def should_continue(self):
+        return not self._interrupted
 
 
 class Command(BaseCommand):
+
+    def __init__(self, *args, **kwargs):
+        super(BaseCommand, self).__init__(*args, **kwargs)
+
+        self.signal_handler = SignalHandler()
+        signal.signal(signal.SIGINT, self.signal_handler.handle_signal)
+        signal.signal(signal.SIGTERM, self.signal_handler.handle_signal)
+        signal.signal(signal.SIGQUIT, self.signal_handler.handle_signal)
+
     def add_arguments(self, parser):
         parser.add_argument('--queue', required=True)
         parser.add_argument('--celery-app', required=False)
@@ -34,11 +43,7 @@ class Command(BaseCommand):
             if queue_name == 'celery':
                 consumer = consumers.CeleryConsumer(celery_app=options['celery_app'])
 
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
-            signal.signal(signal.SIGQUIT, signal_handler)
-
-            while should_continue():
+            while self.signal_handler.should_continue():
                 consumer.collect_queue_metrics()
                 consumer.run()
 

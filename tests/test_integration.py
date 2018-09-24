@@ -12,29 +12,22 @@ from tests.compat import mock
 class ProcessTasksTest(TestCase):
 
     def setUp(self):
-        should_continue_patch = mock.patch(
-            'mbq.atomiq.management.commands.atomic_run_consumer.should_continue',
-            side_effect=[True, True, False],
+        signal_handler = mock.patch(
+            'mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler'
         )
-        should_continue_patch.start()
-        self.addCleanup(should_continue_patch.stop)
-
-        with transaction.atomic():
-            self.sns_task1 = mbq.atomiq.sns_publish('topic_arn1', {'sns1': 'sns1'})
-            self.sns_task2 = mbq.atomiq.sns_publish('topic_arn2', {'sns2': 'sns2'})
-
-            self.sqs_task1 = mbq.atomiq.sqs_publish('queue_url1', {'sqs1': 'sqs1'})
-            self.sqs_task2 = mbq.atomiq.sqs_publish('queue_url2', {'sqs2': 'sqs2'})
-
-            test_task = mock.MagicMock()
-            test_task.name = 'test_task'
-            self.celery_task1 = mbq.atomiq.celery_publish(test_task, 'one', 2, False, test=True)
-            self.celery_task2 = mbq.atomiq.celery_publish(test_task, 3, 'two', True, test='Hello')
+        signal_handler_mock = signal_handler.start()
+        signal_handler_mock.return_value.should_continue.side_effect = [True, True, False]
+        self.addCleanup(signal_handler_mock.stop)
 
     @mock.patch('boto3.client')
     def test_sns_task_runs(self, boto_client):
         sns_client = mock.MagicMock()
         boto_client.return_value = sns_client
+
+        with transaction.atomic():
+            mbq.atomiq.sns_publish('topic_arn1', {'sns1': 'sns1'})
+            mbq.atomiq.sns_publish('topic_arn2', {'sns2': 'sns2'})
+
         call_command('atomic_run_consumer', '--queue=sns')
 
         boto_client.assert_called_once_with('sns')
@@ -56,6 +49,11 @@ class ProcessTasksTest(TestCase):
     def test_sqs_task_runs(self, boto_client):
         sqs_client = mock.MagicMock()
         boto_client.return_value = sqs_client
+
+        with transaction.atomic():
+            mbq.atomiq.sqs_publish('queue_url1', {'sqs1': 'sqs1'})
+            mbq.atomiq.sqs_publish('queue_url2', {'sqs2': 'sqs2'})
+
         call_command('atomic_run_consumer', '--queue=sqs')
 
         boto_client.assert_called_once_with('sqs')
@@ -73,6 +71,13 @@ class ProcessTasksTest(TestCase):
 
     @mock.patch.dict(celery_app.tasks, {'test_task': mock.MagicMock()})
     def test_celery_task_runs(self):
+        test_task = mock.MagicMock()
+        test_task.name = 'test_task'
+
+        with transaction.atomic():
+            mbq.atomiq.celery_publish(test_task, 'one', 2, False, test=True)
+            mbq.atomiq.celery_publish(test_task, 3, 'two', True, test='Hello')
+
         call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
 
         celery_calls = [
