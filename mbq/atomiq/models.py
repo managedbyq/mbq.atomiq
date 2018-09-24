@@ -34,15 +34,18 @@ class Task(models.Model):
         max_length=256,
         default=constants.TaskStates.ENQUEUED,
     )
+    objects = TaskManager()
 
     class Meta:
         abstract = True
+        indexes = [
+            models.Index(fields=['state', 'visible_after'])
+        ]
 
 
 class SNSTask(Task):
     topic_arn = models.CharField(max_length=256)
     payload = JSONField()
-    objects = TaskManager()
 
     class Meta:
         verbose_name = 'SNS Task'
@@ -51,7 +54,6 @@ class SNSTask(Task):
 class SQSTask(Task):
     queue_url = models.CharField(max_length=256)
     payload = JSONField()
-    objects = TaskManager()
 
     class Meta:
         verbose_name = 'SQS Task'
@@ -60,7 +62,6 @@ class SQSTask(Task):
 class CeleryTask(Task):
     task_name = models.CharField(max_length=256)
     task_arguments = JSONField(dump_kwargs={})
-    objects = TaskManager()
 
     class Meta:
         verbose_name = 'Celery Task'
