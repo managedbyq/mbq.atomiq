@@ -84,19 +84,10 @@ class BaseConsumer(object):
     def publish(self, task):
         raise NotImplementedError('publish must be implemented by subclasses.')
 
-    def collect_queue_metrics(self):
-        for state in constants.TaskStates.CHOICES:
-            state = state[0]
-            _collector.gauge(
-                'state_total',
-                self.model.objects.filter(state=state).count(),
-                tags={'state': state, 'queue_type': self.queue_type},
-            )
-
 
 class SNSConsumer(BaseConsumer):
     model = models.SNSTask
-    queue_type = 'sns'
+    queue_type = constants.QueueType.SNS
     sns_client = None
 
     def __init__(self):
@@ -115,7 +106,7 @@ class SNSConsumer(BaseConsumer):
 
 class SQSConsumer(BaseConsumer):
     model = models.SQSTask
-    queue_type = 'sqs'
+    queue_type = constants.QueueType.SQS
     sqs_client = None
 
     def __init__(self):
@@ -133,7 +124,7 @@ class SQSConsumer(BaseConsumer):
 
 class CeleryConsumer(BaseConsumer):
     model = models.CeleryTask
-    queue_type = 'celery'
+    queue_type = constants.QueueType.CELERY
     celery_app = None
 
     def __init__(self, celery_app):

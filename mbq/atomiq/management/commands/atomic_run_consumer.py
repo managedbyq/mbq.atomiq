@@ -44,7 +44,6 @@ class Command(BaseCommand):
                 consumer = consumers.CeleryConsumer(celery_app=options['celery_app'])
 
             while self.signal_handler.should_continue():
-                consumer.collect_queue_metrics()
                 consumer.run()
 
         except Exception:

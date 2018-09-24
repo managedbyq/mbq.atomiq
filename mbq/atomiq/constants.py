@@ -12,6 +12,12 @@ class TaskStates(object):
     )
 
 
+class QueueType(object):
+    SNS = 'sns'
+    SQS = 'sqs'
+    CELERY = 'celery'
+
+
 MAX_ATTEMPTS_TO_PROCESS_TASKS = 3
 
 
