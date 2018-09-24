@@ -47,7 +47,7 @@ class SNSTask(Task):
     topic_arn = models.CharField(max_length=256)
     payload = JSONField()
 
-    class Meta:
+    class Meta(Task.Meta):
         verbose_name = 'SNS Task'
 
 
@@ -55,7 +55,7 @@ class SQSTask(Task):
     queue_url = models.CharField(max_length=256)
     payload = JSONField()
 
-    class Meta:
+    class Meta(Task.Meta):
         verbose_name = 'SQS Task'
 
 
@@ -63,5 +63,5 @@ class CeleryTask(Task):
     task_name = models.CharField(max_length=256)
     task_arguments = JSONField(dump_kwargs={})
 
-    class Meta:
+    class Meta(Task.Meta):
         verbose_name = 'Celery Task'
