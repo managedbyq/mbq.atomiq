@@ -1,10 +1,11 @@
+import collections
 import signal
 
 from django.core.management.base import BaseCommand
 
 import rollbar
 
-from ... import consumers
+from ... import _collector, constants, consumers, models, utils
 
 
 class SignalHandler():
@@ -29,22 +30,55 @@ class Command(BaseCommand):
         signal.signal(signal.SIGTERM, self.signal_handler.handle_signal)
         signal.signal(signal.SIGQUIT, self.signal_handler.handle_signal)
 
+        self.queues = {
+            constants.QueueType.SNS: {
+                'model': models.SNSTask,
+                'consumer_class': consumers.SNSConsumer,
+            },
+            constants.QueueType.SQS: {
+                'model': models.SQSTask,
+                'consumer_class': consumers.SQSConsumer,
+            },
+            constants.QueueType.CELERY: {
+                'model': models.CeleryTask,
+                'consumer_class': consumers.CeleryConsumer,
+            },
+        }
+
     def add_arguments(self, parser):
-        parser.add_argument('--queue', required=True)
+        queue_type_choices = [c[0] for c in constants.QueueType.CHOICES]
+        parser.add_argument('--queue', required=True, choices=queue_type_choices)
         parser.add_argument('--celery-app', required=False)
+
+
+    @utils.debounce(minutes=15)
+    def collect_metrics(self):
+        queue_type = options['queue']
+        model = self.queues[queue_type]['model']
+
+        state_counts = collections.Counter(model.objects.values_list('state', flat=True))
+        for state, count in state_counts.items():
+            _collector.gauge(
+                'state_total',
+                count,
+                tags={'state': state, 'queue_type': queue_type},
+            )
 
     def handle(self, *args, **options):
         try:
-            queue_name = options['queue']
-            if queue_name == 'sns':
-                consumer = consumers.SNSConsumer()
-            if queue_name == 'sqs':
-                consumer = consumers.SQSConsumer()
-            if queue_name == 'celery':
-                consumer = consumers.CeleryConsumer(celery_app=options['celery_app'])
+            queue_type = options['queue']
+
+            Consumer = self.queues[queue_type]['consumer_class']
+
+            consumer_kwargs = {}
+            if queue_name == constants.QueueType.CELERY:
+                consumer_kwargs['celery_app'] = options['celery_app']
+
+            consumer = Consumer(**consumer_kwargs)
 
             while self.signal_handler.should_continue():
                 consumer.run()
+                self.collect_metrics()
 
         except Exception:
             rollbar.report_exc_info()

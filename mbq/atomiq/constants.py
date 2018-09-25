@@ -17,6 +17,12 @@ class QueueType(object):
     SQS = 'sqs'
     CELERY = 'celery'
 
+    CHOICES = (
+        (SNS, 'SNS'),
+        (SQS, 'SQS'),
+        (CELERY, 'Celery'),
+    )
+
 
 MAX_ATTEMPTS_TO_PROCESS_TASKS = 3
 
