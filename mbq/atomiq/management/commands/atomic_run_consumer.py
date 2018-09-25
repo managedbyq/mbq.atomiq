@@ -10,6 +10,9 @@ import rollbar
 from ... import _collector, constants, consumers, utils
 
 
+CLEANUP_DELAY_MINUTES = 15
+
+
 class SignalHandler():
 
     def __init__(self):
@@ -43,7 +46,7 @@ class Command(BaseCommand):
         parser.add_argument('--queue', required=True, choices=queue_type_choices)
         parser.add_argument('--celery-app', required=False)
 
-    @utils.debounce(minutes=15)
+    @utils.debounce(minutes=CLEANUP_DELAY_MINUTES)
     def cleanup_old_tasks(self, **options):
         days_to_keep_old_tasks = constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS
         time_to_delete_before = arrow.utcnow().shift(days=-days_to_keep_old_tasks)

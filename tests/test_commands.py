@@ -31,6 +31,7 @@ class RunConsumerCommandTest(TestCase):
 
 
 @mock.patch('mbq.atomiq.constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS', 30)
+@mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.CLEANUP_DELAY_MINUTES', 0)
 class ClenupTasksTest(TestCase):
 
     def setUp(self):
