@@ -31,19 +31,10 @@ class Command(BaseCommand):
         signal.signal(signal.SIGTERM, self.signal_handler.handle_signal)
         signal.signal(signal.SIGQUIT, self.signal_handler.handle_signal)
 
-        self.queues = {
-            constants.QueueType.SNS: {
-                'model': models.SNSTask,
-                'consumer_class': consumers.SNSConsumer,
-            },
-            constants.QueueType.SQS: {
-                'model': models.SQSTask,
-                'consumer_class': consumers.SQSConsumer,
-            },
-            constants.QueueType.CELERY: {
-                'model': models.CeleryTask,
-                'consumer_class': consumers.CeleryConsumer,
-            },
+        self.consumers = {
+            constants.QueueType.SNS: consumers.SNSConsumer,
+            constants.QueueType.SQS: consumers.SQSConsumer,
+            constants.QueueType.CELERY: consumers.CeleryConsumer,
         }
 
     def add_arguments(self, parser):
@@ -52,20 +43,20 @@ class Command(BaseCommand):
         parser.add_argument('--celery-app', required=False)
 
     @utils.debounce(minutes=15)
-    def cleanup_old_tasks():
+    def cleanup_old_tasks(self, **options):
         days_to_keep_old_tasks = constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS
         time_to_delete_before = arrow.utcnow().shift(days=-days_to_keep_old_tasks)
 
-        model = self.queues[options['queue']]['model']
+        model = self.consumers[options['queue']].model
         model.objects.filter(
             state__in=[constants.TaskStates.SUCCEEDED, constants.TaskStates.DELETED],
             created_at__lt=time_to_delete_before.datetime,
         ).delete()
 
     @utils.debounce(seconds=15)
-    def collect_metrics(self):
+    def collect_metrics(self, **options):
         queue_type = options['queue']
-        model = self.queues[queue_type]['model']
+        model = self.consumers[queue_type].model
 
         state_counts = collections.Counter(model.objects.values_list('state', flat=True))
         for state, count in state_counts.items():
@@ -79,18 +70,18 @@ class Command(BaseCommand):
         try:
             queue_type = options['queue']
 
-            Consumer = self.queues[queue_type]['consumer_class']
+            Consumer = self.consumers[queue_type]
 
             consumer_kwargs = {}
-            if queue_name == constants.QueueType.CELERY:
+            if queue_type == constants.QueueType.CELERY:
                 consumer_kwargs['celery_app'] = options['celery_app']
 
             consumer = Consumer(**consumer_kwargs)
 
             while self.signal_handler.should_continue():
                 consumer.run()
-                self.collect_metrics()
-                self.cleanup_old_tasks()
+                self.collect_metrics(**options)
+                self.cleanup_old_tasks(**options)
 
         except Exception:
             rollbar.report_exc_info()
