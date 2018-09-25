@@ -1,7 +1,7 @@
 import uuid
 
 from django.db import transaction
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, TransactionTestCase
 
 import arrow
 import mbq.atomiq
@@ -9,12 +9,42 @@ from mbq.atomiq import constants, exceptions, models, producers
 from tests.compat import mock
 
 
-class TransactionCheckTest(SimpleTestCase):
+class CheckSimpleTestCaseTest(SimpleTestCase):
     allow_database_queries = True
 
     def test_outside_of_transaction(self):
         producer = producers.BaseProducer()
         self.assertFalse(producer._is_running_within_transaction())
+
+    def test_in_transaction(self):
+        producer = producers.BaseProducer()
+        with transaction.atomic():
+            import pdb; pdb.set_trace()
+            self.assertTrue(producer._is_running_within_transaction())
+
+
+class CheckTransactionTestCaseTest(TransactionTestCase):
+
+    def test_outside_of_transaction(self):
+        producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
+
+    def test_in_transaction(self):
+        producer = producers.BaseProducer()
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
+
+
+class CheckTestCaseTest(TestCase):
+
+    def test_outside_of_transaction(self):
+        producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
+
+    def test_in_transaction(self):
+        producer = producers.BaseProducer()
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
 
 
 class SNSProducerTest(TestCase):
