@@ -8,7 +8,7 @@ def time_difference_ms(start_datetime, end_datetime):
     return round(diff_in_seconds * 1000)
 
 
-def debounce(days=None, hours=None, minutes=None, seconds=None):
+def debounce(seconds=None, minutes=None, hours=None):
     def wrapper(func):
         last_run = 0
         seconds_between_runs = 0
@@ -19,8 +19,6 @@ def debounce(days=None, hours=None, minutes=None, seconds=None):
             seconds_between_runs += minutes * 60
         if hours:
             seconds_between_runs += hours * 60 * 60
-        if days:
-            seconds_between_runs += days * 24 * 60 * 60
 
         @wraps(func)
         def wrapped_func(*args, **kwargs):

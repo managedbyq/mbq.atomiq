@@ -3,6 +3,7 @@ import signal
 
 from django.core.management.base import BaseCommand
 
+import arrow
 import rollbar
 
 from ... import _collector, constants, consumers, models, utils
@@ -50,8 +51,18 @@ class Command(BaseCommand):
         parser.add_argument('--queue', required=True, choices=queue_type_choices)
         parser.add_argument('--celery-app', required=False)
 
-
     @utils.debounce(minutes=15)
+    def cleanup_old_tasks():
+        days_to_keep_old_tasks = constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS
+        time_to_delete_before = arrow.utcnow().shift(days=-days_to_keep_old_tasks)
+
+        model = self.queues[options['queue']]['model']
+        model.objects.filter(
+            state__in=[constants.TaskStates.SUCCEEDED, constants.TaskStates.DELETED],
+            created_at__lt=time_to_delete_before.datetime,
+        ).delete()
+
+    @utils.debounce(seconds=15)
     def collect_metrics(self):
         queue_type = options['queue']
         model = self.queues[queue_type]['model']
@@ -79,6 +90,7 @@ class Command(BaseCommand):
             while self.signal_handler.should_continue():
                 consumer.run()
                 self.collect_metrics()
+                self.cleanup_old_tasks()
 
         except Exception:
             rollbar.report_exc_info()
