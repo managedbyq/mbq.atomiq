@@ -14,14 +14,14 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name='snstask',
-            index=models.Index(fields=[b'state', b'visible_after'], name='atomiq_snst_state_c7f457_idx'),
+            index=models.Index(fields=['state', 'visible_after'], name='atomiq_snst_state_c7f457_idx'),
         ),
         migrations.AddIndex(
             model_name='sqstask',
-            index=models.Index(fields=[b'state', b'visible_after'], name='atomiq_sqst_state_6e91d2_idx'),
+            index=models.Index(fields=['state', 'visible_after'], name='atomiq_sqst_state_6e91d2_idx'),
         ),
         migrations.AddIndex(
             model_name='celerytask',
-            index=models.Index(fields=[b'state', b'visible_after'], name='atomiq_cele_state_dc21c4_idx'),
+            index=models.Index(fields=['state', 'visible_after'], name='atomiq_cele_state_dc21c4_idx'),
         ),
     ]
