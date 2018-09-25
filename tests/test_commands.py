@@ -34,15 +34,18 @@ class RunConsumerCommandTest(TestCase):
 class ClenupTasksTest(TestCase):
 
     def setUp(self):
-        SignalHandlerPatch = mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler')
+        SignalHandlerPatch = mock.patch(
+            'mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler'
+        )
         SignalHandlerMock = SignalHandlerPatch.start()
         SignalHandlerMock.return_value.should_continue.side_effect = [True, False]
         self.addCleanup(SignalHandlerMock.stop)
 
-        consumer_run_mock = mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.consumers.SNSConsumer.run')
+        consumer_run_mock = mock.patch(
+            'mbq.atomiq.management.commands.atomic_run_consumer.consumers.SNSConsumer.run'
+        )
         consumer_run_mock.start()
         self.addCleanup(consumer_run_mock.stop)
-
 
     def test_cleanup(self):
         now_datetime = arrow.utcnow()
@@ -102,4 +105,3 @@ class ClenupTasksTest(TestCase):
             self.assertTrue(models.SNSTask.objects.filter(id=task_processed2.id).exists())
             self.assertFalse(models.SNSTask.objects.filter(id=task_deleted3.id).exists())
             self.assertFalse(models.SNSTask.objects.filter(id=task_processed3.id).exists())
-

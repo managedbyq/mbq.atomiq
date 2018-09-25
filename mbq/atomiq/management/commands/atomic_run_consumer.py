@@ -4,9 +4,10 @@ import signal
 from django.core.management.base import BaseCommand
 
 import arrow
+
 import rollbar
 
-from ... import _collector, constants, consumers, models, utils
+from ... import _collector, constants, consumers, utils
 
 
 class SignalHandler():
