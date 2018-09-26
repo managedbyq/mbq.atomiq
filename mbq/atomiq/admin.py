@@ -42,6 +42,9 @@ class BaseTaskAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, *args, **kwrargs):
+        return False
+
     def admin_error_message(self, task):
         return format_html(
             '<div style="max-width:500px" >{}</div>',
