@@ -106,7 +106,6 @@ class SQSProducerTest(TestCase):
 class CeleryProducerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        super(CeleryProducerTest, cls).setUpTestData()
         cls.mock_task = mock.Mock()
 
     def test_outside_of_transaction(self):
