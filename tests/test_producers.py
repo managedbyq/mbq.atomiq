@@ -19,21 +19,19 @@ class CheckSimpleTestCaseTest(SimpleTestCase):
     def test_in_transaction(self):
         producer = producers.BaseProducer()
         with transaction.atomic():
-            # import pdb; pdb.set_trace()
             self.assertTrue(producer._is_running_within_transaction())
 
 
 class CheckTestCaseTest(TestCase):
 
-    # @classmethod
-    # def setUpTestData(cls):
-    #     producer = producers.BaseProducer()
-    #     # import pdb; pdb.set_trace()
-    #     if not producer._is_running_within_transaction():
-    #         raise Exception(
-    #             '_is_running_within_transaction should return True in setUpTestData '
-    #             'in django TestCase'
-    #         )
+    @classmethod
+    def setUpTestData(cls):
+        producer = producers.BaseProducer()
+        if not producer._is_running_within_transaction():
+            raise Exception(
+                '_is_running_within_transaction should return True in setUpTestData '
+                'in django TestCase'
+            )
 
     def setUp(self):
         producer = producers.BaseProducer()

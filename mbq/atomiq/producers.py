@@ -37,20 +37,45 @@ class BaseProducer(object):
         self._dependencies_confirmed = True
 
     def _is_running_within_transaction(self):
-        db_connection = transaction.get_connection()
+        db_conns = transaction.get_connection()
 
-        if not db_connection.in_atomic_block:
+        if not db_conns.in_atomic_block:
             return False
 
         """
-        Django TestCase  wraps everything in a transaction, but we still want to
-        make unit tests fail without an explicit atomic transaction definition.
-        So when we're running in test mode, we are going to check the number of existing
-        save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
+        Django TestCase wraps the whole test class in a transaction. This transaction
+        gets created in setUpClass.
+        Django TestCase wraps each individual test function in an additional transaction.
+        So if we are in setUpTestDAta, we expect there to be 1 transaction,
+        and if we are in any other function in a TestCase class, we expect there to be 2
+        transactions.
         """
         if RUNNING_TESTS:
-            if len(db_connection.savepoint_ids) < 2:
-                return False
+            import inspect
+            from django.test import TestCase
+            inSetup = False
+            inTestCase = False
+            for stack_frame in inspect.stack():
+                frame = stack_frame[0]
+                localVars = frame.f_locals
+                selfVar = localVars.get('self')
+                if selfVar:
+                    selfClass = getattr(selfVar, '__class__')
+                    if inspect.isclass(selfClass) and issubclass(selfClass, TestCase):
+                        inTestCase = True
+
+                clsClass = localVars.get('cls')
+                if inspect.isclass(clsClass) and issubclass(clsClass, TestCase):
+                    inTestCase = True
+
+                if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
+                    inSetup = True
+
+            if inTestCase:
+                if inSetup:
+                    return True
+                elif len(db_conns.savepoint_ids) < 2:
+                    return False
 
         return True
 
