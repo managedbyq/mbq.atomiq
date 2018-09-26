@@ -43,12 +43,10 @@ class BaseProducer(object):
             return False
 
         """
-        Django TestCase wraps the whole test class in a transaction. This transaction
-        gets created in setUpClass.
-        Django TestCase wraps each individual test function in an additional transaction.
-        So if we are in setUpTestDAta, we expect there to be 1 transaction,
-        and if we are in any other function in a TestCase class, we expect there to be 2
-        transactions.
+        Django TestCase  wraps everything in a transaction, but we still want to
+        make unit tests fail without an explicit atomic transaction definition.
+        So when we're running in test mode, we are going to check the number of existing
+        save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
         """
         if RUNNING_TESTS:
             import inspect
