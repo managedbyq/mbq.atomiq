@@ -62,11 +62,12 @@ class Command(BaseCommand):
         model = self.consumers[queue_type].model
 
         state_counts = collections.Counter(model.objects.values_list('state', flat=True))
-        for state, count in state_counts.items():
+        task_states = [state[0] for state in constants.TaskStates.CHOICES]
+        for task_state in task_states:
             _collector.gauge(
                 'state_total',
-                count,
-                tags={'state': state, 'queue_type': queue_type},
+                state_counts.get(task_state, 0),
+                tags={'state': task_states, 'queue_type': queue_type},
             )
 
     def handle(self, *args, **options):
