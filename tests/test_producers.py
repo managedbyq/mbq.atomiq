@@ -25,15 +25,15 @@ class CheckSimpleTestCaseTest(SimpleTestCase):
 
 class CheckTestCaseTest(TestCase):
 
-    @classmethod
-    def setUpTestData(cls):
-        producer = producers.BaseProducer()
-        # import pdb; pdb.set_trace()
-        if not producer._is_running_within_transaction():
-            raise Exception(
-                '_is_running_within_transaction should return True in setUpTestData '
-                'in django TestCase'
-            )
+    # @classmethod
+    # def setUpTestData(cls):
+    #     producer = producers.BaseProducer()
+    #     # import pdb; pdb.set_trace()
+    #     if not producer._is_running_within_transaction():
+    #         raise Exception(
+    #             '_is_running_within_transaction should return True in setUpTestData '
+    #             'in django TestCase'
+    #         )
 
     def setUp(self):
         producer = producers.BaseProducer()

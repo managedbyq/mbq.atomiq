@@ -14,6 +14,7 @@ services:
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py27
+    command: [./test.sh]
 
   py36:
     build:
@@ -27,6 +28,7 @@ services:
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py36
+    command: [./test.sh]
 
   py37:
     build:
@@ -40,6 +42,7 @@ services:
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py37
+    command: [./test.sh]
 
   pypy3:
     build:
@@ -53,6 +56,7 @@ services:
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: pypy3
+    command: [./test.sh]
 
   mysql:
     image: mysql:5.6
