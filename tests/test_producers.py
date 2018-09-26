@@ -1,8 +1,7 @@
 import uuid
 
 from django.db import transaction
-from django.test import SimpleTestCase, TestCase, TransactionTestCase
-
+from django.test import SimpleTestCase, TestCase
 import arrow
 import mbq.atomiq
 from mbq.atomiq import constants, exceptions, models, producers
@@ -19,23 +18,25 @@ class CheckSimpleTestCaseTest(SimpleTestCase):
     def test_in_transaction(self):
         producer = producers.BaseProducer()
         with transaction.atomic():
-            import pdb; pdb.set_trace()
-            self.assertTrue(producer._is_running_within_transaction())
-
-
-class CheckTransactionTestCaseTest(TransactionTestCase):
-
-    def test_outside_of_transaction(self):
-        producer = producers.BaseProducer()
-        self.assertFalse(producer._is_running_within_transaction())
-
-    def test_in_transaction(self):
-        producer = producers.BaseProducer()
-        with transaction.atomic():
+            # import pdb; pdb.set_trace()
             self.assertTrue(producer._is_running_within_transaction())
 
 
 class CheckTestCaseTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        producer = producers.BaseProducer()
+        # import pdb; pdb.set_trace()
+        if not producer._is_running_within_transaction():
+            raise Exception(
+                '_is_running_within_transaction should return True in setUpTestData '
+                'in django TestCase'
+            )
+
+    def setUp(self):
+        producer = producers.BaseProducer()
+        self.assertTrue(producer._is_running_within_transaction())
 
     def test_outside_of_transaction(self):
         producer = producers.BaseProducer()
@@ -109,8 +110,8 @@ class SQSProducerTest(TestCase):
 
 class CeleryProducerTest(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super(CeleryProducerTest, cls).setUpClass()
+    def setUpTestData(cls):
+        super(CeleryProducerTest, cls).setUpTestData()
         cls.mock_task = mock.Mock()
 
     def test_outside_of_transaction(self):
