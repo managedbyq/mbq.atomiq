@@ -42,6 +42,9 @@ class BaseTaskAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+    def has_add_permission(self, *args, **kwrargs):
+        return False
+
     def admin_error_message(self, task):
         return format_html(
             '<div style="max-width:500px" >{}</div>',
@@ -88,16 +91,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
 
 
 def get_name_from_topic_arn(arn):
-    if len(arn) <= 40:
-        return arn
-
-    start = arn[:7]
-    end = arn[-32:]
-
-    if ':' in end:
-        end = end.split(':')[-1]
-
-    return '{}...{}'.format(start, end)
+    return arn.split(':')[-1]
 
 
 class SNSTopicListFilter(admin.SimpleListFilter):
@@ -105,8 +99,8 @@ class SNSTopicListFilter(admin.SimpleListFilter):
     parameter_name = 'topic_arn'
 
     def lookups(self, request, model_admin):
-        qs = model_admin.get_queryset(request)
-        topic_arns = set(qs.values_list('topic_arn', flat=True))
+        qs = model_admin.get_queryset(request).order_by('topic_arn')
+        topic_arns = qs.values_list('topic_arn', flat=True).distinct()
         for arn in topic_arns:
             yield (arn, get_name_from_topic_arn(arn))
 
@@ -136,16 +130,7 @@ class SNSTaskAdmin(BaseTaskAdmin):
 
 
 def get_name_from_queue_url(url):
-    if len(url) <= 40:
-        return url
-
-    start = url[:8]
-    end = url[-32:]
-
-    if '/' in end:
-        end = end.split('/')[-1]
-
-    return '{}.../{}'.format(start, end)
+    return url.split('/')[-1]
 
 
 class SQSTopicListFilter(admin.SimpleListFilter):
@@ -153,8 +138,8 @@ class SQSTopicListFilter(admin.SimpleListFilter):
     parameter_name = 'queue_url'
 
     def lookups(self, request, model_admin):
-        qs = model_admin.get_queryset(request)
-        queue_urls = set(qs.values_list('queue_url', flat=True))
+        qs = model_admin.get_queryset(request).order_by('queue_url')
+        queue_urls = qs.values_list('queue_url', flat=True).distinct()
         for url in queue_urls:
             yield (url, get_name_from_queue_url(url))
 
