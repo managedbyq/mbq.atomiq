@@ -1,13 +1,10 @@
 import importlib
-import inspect
 import logging
 import sys
 
-from django.test import TestCase
-
 from django.db import transaction
 
-from . import exceptions, models
+from . import exceptions, models, utils
 
 
 logger = logging.getLogger(__name__)
@@ -52,34 +49,7 @@ class BaseProducer(object):
         save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
         """
         if RUNNING_TESTS:
-            in_setup = False
-            in_test_case = False
-
-            # This loops through the call stack and sets "in_setup" and "in_test_case"
-            for stack_frame in inspect.stack():
-                for local_var in stack_frame[0].f_locals.values():
-                    if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
-                        in_setup = True
-
-                    if not local_var:
-                        continue
-
-                    if inspect.isclass(local_var) and issubclass(local_var, TestCase):
-                        in_test_case = True
-                    else:
-                        var_class = getattr(local_var, '__class__', None)
-                        if inspect.isclass(var_class) and issubclass(var_class, TestCase):
-                            in_test_case = True
-
-            if in_test_case:
-                if in_setup:
-                    # Don't enforce transactions in TestCase setup functions
-                    return True
-
-                elif len(db_connection.savepoint_ids) < 2:
-                    # Enforce 1 user transaction in TestCase unit tests
-                    return False
-
+            å
         return True
 
     def _transaction_check(self):
