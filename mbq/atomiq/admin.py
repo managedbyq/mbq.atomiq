@@ -91,7 +91,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
 
 
 def get_name_from_topic_arn(arn):
-   return arn.split(':')[-1]
+    return arn.split(':')[-1]
 
 
 class SNSTopicListFilter(admin.SimpleListFilter):
