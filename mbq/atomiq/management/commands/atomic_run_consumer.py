@@ -67,7 +67,7 @@ class Command(BaseCommand):
             _collector.gauge(
                 'state_total',
                 state_counts.get(task_state, 0),
-                tags={'state': task_states, 'queue_type': queue_type},
+                tags={'state': task_state, 'queue_type': queue_type},
             )
 
     def handle(self, *args, **options):
