@@ -53,6 +53,8 @@ class BaseProducer(object):
             from django.test import TestCase
             inSetup = False
             inTestCase = False
+
+            # This loops through the call stack and sets "isSetUp" and "isTestCase"
             for stack_frame in inspect.stack():
                 frame = stack_frame[0]
                 localVars = frame.f_locals
@@ -71,8 +73,11 @@ class BaseProducer(object):
 
             if inTestCase:
                 if inSetup:
+                    # Don't enforce transactions in TestCase setup functions
                     return True
+
                 elif len(db_connection.savepoint_ids) < 2:
+                    # Enforce 1 user transaction in TestCase unit tests
                     return False
 
         return True
