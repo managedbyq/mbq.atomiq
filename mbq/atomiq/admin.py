@@ -99,7 +99,7 @@ class SNSTopicListFilter(admin.SimpleListFilter):
     parameter_name = 'topic_arn'
 
     def lookups(self, request, model_admin):
-        qs = model_admin.get_queryset(request)
+        qs = model_admin.get_queryset(request).order_by('topic_arn')
         topic_arns = qs.values_list('topic_arn', flat=True).distinct()
         for arn in topic_arns:
             yield (arn, get_name_from_topic_arn(arn))
@@ -138,7 +138,7 @@ class SQSTopicListFilter(admin.SimpleListFilter):
     parameter_name = 'queue_url'
 
     def lookups(self, request, model_admin):
-        qs = model_admin.get_queryset(request)
+        qs = model_admin.get_queryset(request).order_by('queue_url')
         queue_urls = qs.values_list('queue_url', flat=True).distinct()
         for url in queue_urls:
             yield (url, get_name_from_queue_url(url))
