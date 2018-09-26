@@ -37,9 +37,9 @@ class BaseProducer(object):
         self._dependencies_confirmed = True
 
     def _is_running_within_transaction(self):
-        db_conns = transaction.get_connection()
+        db_connection = transaction.get_connection()
 
-        if not db_conns.in_atomic_block:
+        if not db_connection.in_atomic_block:
             return False
 
         """
@@ -74,7 +74,7 @@ class BaseProducer(object):
             if inTestCase:
                 if inSetup:
                     return True
-                elif len(db_conns.savepoint_ids) < 2:
+                elif len(db_connection.savepoint_ids) < 2:
                     return False
 
         return True
