@@ -10,7 +10,7 @@ def time_difference_ms(start_datetime, end_datetime):
 def debounce(seconds=None, minutes=None, hours=None):
     def wrapper(func):
         func.seconds_between_runs = 0
-        func.last_run = 0
+        func.last_run = time.time()
 
         if seconds:
             func.seconds_between_runs += seconds

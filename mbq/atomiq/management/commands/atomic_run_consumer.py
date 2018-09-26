@@ -10,9 +10,6 @@ import rollbar
 from ... import _collector, constants, consumers, utils
 
 
-CLEANUP_DELAY_MINUTES = 15
-
-
 class SignalHandler():
 
     def __init__(self):
@@ -29,7 +26,6 @@ class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
         super(BaseCommand, self).__init__(*args, **kwargs)
-
         self.signal_handler = SignalHandler()
         signal.signal(signal.SIGINT, self.signal_handler.handle_signal)
         signal.signal(signal.SIGTERM, self.signal_handler.handle_signal)
@@ -46,16 +42,19 @@ class Command(BaseCommand):
         parser.add_argument('--queue', required=True, choices=queue_type_choices)
         parser.add_argument('--celery-app', required=False)
 
-    @utils.debounce(minutes=CLEANUP_DELAY_MINUTES)
-    def cleanup_old_tasks(self, **options):
+    def cleanup_old_tasks(self, queue_type):
         days_to_keep_old_tasks = constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS
         time_to_delete_before = arrow.utcnow().shift(days=-days_to_keep_old_tasks)
 
-        model = self.consumers[options['queue']].model
+        model = self.consumers[queue_type].model
         model.objects.filter(
             state__in=[constants.TaskStates.SUCCEEDED, constants.TaskStates.DELETED],
             created_at__lt=time_to_delete_before.datetime,
         ).delete()
+
+    @utils.debounce(minutes=15)
+    def run_delayed_cleanup(self, **options):
+        self.cleanup_old_tasks(options['queue'])
 
     @utils.debounce(seconds=15)
     def collect_metrics(self, **options):
@@ -85,7 +84,7 @@ class Command(BaseCommand):
             while self.signal_handler.should_continue():
                 consumer.run()
                 self.collect_metrics(**options)
-                self.cleanup_old_tasks(**options)
+                self.run_delayed_cleanup(**options)
 
         except Exception:
             rollbar.report_exc_info()

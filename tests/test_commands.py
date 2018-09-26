@@ -3,6 +3,7 @@ from django.test import TestCase
 
 import arrow
 from mbq.atomiq import constants, models
+from mbq.atomiq.management.commands import atomic_run_consumer
 from tests.compat import mock
 
 import freezegun
@@ -31,24 +32,11 @@ class RunConsumerCommandTest(TestCase):
 
 
 @mock.patch('mbq.atomiq.constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS', 30)
-@mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.CLEANUP_DELAY_MINUTES', 0)
 class ClenupTasksTest(TestCase):
 
-    def setUp(self):
-        SignalHandlerPatch = mock.patch(
-            'mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler'
-        )
-        SignalHandlerMock = SignalHandlerPatch.start()
-        SignalHandlerMock.return_value.should_continue.side_effect = [True, False]
-        self.addCleanup(SignalHandlerMock.stop)
+    def test_cleanup(self, *args):
+        command = atomic_run_consumer.Command()
 
-        consumer_run_mock = mock.patch(
-            'mbq.atomiq.management.commands.atomic_run_consumer.consumers.SNSConsumer.run'
-        )
-        consumer_run_mock.start()
-        self.addCleanup(consumer_run_mock.stop)
-
-    def test_cleanup(self):
         now_datetime = arrow.utcnow()
         days_before_now_10 = now_datetime.shift(days=-10)
         days_before_now_30 = now_datetime.shift(days=-30)
@@ -76,6 +64,7 @@ class ClenupTasksTest(TestCase):
             task_processed1 = models.SNSTask.objects.create(
                 state=constants.TaskStates.SUCCEEDED,
             )
+
         with freezegun.freeze_time(days_before_now_10.datetime):
             # These tasks are in the 2 states that we do delete old tasks for.
             # They were created more recently than 30 days, so they should not be deleted
@@ -97,7 +86,8 @@ class ClenupTasksTest(TestCase):
             )
 
         with freezegun.freeze_time(now_datetime.datetime):
-            call_command('atomic_run_consumer', '--queue=sns')
+            command.cleanup_old_tasks('sns')
+
             self.assertTrue(models.SNSTask.objects.filter(id=task_ready.id).exists())
             self.assertTrue(models.SNSTask.objects.filter(id=task_failed.id).exists())
             self.assertTrue(models.SNSTask.objects.filter(id=task_deleted1.id).exists())
