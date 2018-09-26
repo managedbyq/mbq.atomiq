@@ -91,16 +91,7 @@ class BaseTaskAdmin(admin.ModelAdmin):
 
 
 def get_name_from_topic_arn(arn):
-    if len(arn) <= 40:
-        return arn
-
-    start = arn[:7]
-    end = arn[-32:]
-
-    if ':' in end:
-        end = end.split(':')[-1]
-
-    return '{}...{}'.format(start, end)
+   return arn.split(':')[-1]
 
 
 class SNSTopicListFilter(admin.SimpleListFilter):
@@ -139,16 +130,7 @@ class SNSTaskAdmin(BaseTaskAdmin):
 
 
 def get_name_from_queue_url(url):
-    if len(url) <= 40:
-        return url
-
-    start = url[:8]
-    end = url[-32:]
-
-    if '/' in end:
-        end = end.split('/')[-1]
-
-    return '{}.../{}'.format(start, end)
+    return url.split('/')[-1]
 
 
 class SQSTopicListFilter(admin.SimpleListFilter):
