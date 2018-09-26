@@ -27,11 +27,7 @@ class CheckTestCaseTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         producer = producers.BaseProducer()
-        if not producer._is_running_within_transaction():
-            raise Exception(
-                '_is_running_within_transaction should return True in setUpTestData '
-                'in django TestCase'
-            )
+        assert producer._is_running_within_transaction()
 
     def setUp(self):
         producer = producers.BaseProducer()
