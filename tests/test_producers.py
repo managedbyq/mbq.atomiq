@@ -9,7 +9,7 @@ from mbq.atomiq import constants, exceptions, models, producers
 from tests.compat import mock
 
 
-class CheckSimpleTestCaseTest(SimpleTestCase):
+class DjangoSimpleTestCaseTest(SimpleTestCase):
     allow_database_queries = True
 
     def test_outside_of_transaction(self):
@@ -22,7 +22,7 @@ class CheckSimpleTestCaseTest(SimpleTestCase):
             self.assertTrue(producer._is_running_within_transaction())
 
 
-class CheckTestCaseTest(TestCase):
+class DjangoTestCaseTest(TestCase):
 
     @classmethod
     def setUpTestData(cls):
