@@ -55,22 +55,21 @@ class BaseProducer(object):
             in_setup = False
             in_test_case = False
 
-            # This loops through the call stack and sets "isSetUp" and "isTestCase"
+            # This loops through the call stack and sets "in_setup" and "in_test_case"
             for stack_frame in inspect.stack():
-                frame = stack_frame[0]
-                local_vars = frame.f_locals
-                self_var = local_vars.get('self')
-                if self_var:
-                    selfClass = getattr(self_var, '__class__', None)
-                    if inspect.isclass(selfClass) and issubclass(selfClass, TestCase):
+                for local_var in stack_frame[0].f_locals.values():
+                    if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
+                        in_setup = True
+
+                    if not local_var:
+                        continue
+
+                    if inspect.isclass(local_var) and issubclass(local_var, TestCase):
                         in_test_case = True
-
-                cls_class = local_vars.get('cls')
-                if inspect.isclass(cls_class) and issubclass(cls_class, TestCase):
-                    in_test_case = True
-
-                if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
-                    in_setup = True
+                    else:
+                        var_class = getattr(local_var, '__class__', None)
+                        if inspect.isclass(var_class) and issubclass(var_class, TestCase):
+                            in_test_case = True
 
             if in_test_case:
                 if in_setup:
