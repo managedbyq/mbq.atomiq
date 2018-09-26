@@ -1,6 +1,9 @@
 import importlib
+import inspect
 import logging
 import sys
+
+from django.test import TestCase
 
 from django.db import transaction
 
@@ -49,30 +52,28 @@ class BaseProducer(object):
         save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
         """
         if RUNNING_TESTS:
-            import inspect
-            from django.test import TestCase
-            inSetup = False
-            inTestCase = False
+            in_setup = False
+            in_test_case = False
 
             # This loops through the call stack and sets "isSetUp" and "isTestCase"
             for stack_frame in inspect.stack():
                 frame = stack_frame[0]
-                localVars = frame.f_locals
-                selfVar = localVars.get('self')
-                if selfVar:
-                    selfClass = getattr(selfVar, '__class__')
+                local_vars = frame.f_locals
+                self_var = local_vars.get('self')
+                if self_var:
+                    selfClass = getattr(self_var, '__class__', None)
                     if inspect.isclass(selfClass) and issubclass(selfClass, TestCase):
-                        inTestCase = True
+                        in_test_case = True
 
-                clsClass = localVars.get('cls')
-                if inspect.isclass(clsClass) and issubclass(clsClass, TestCase):
-                    inTestCase = True
+                cls_class = local_vars.get('cls')
+                if inspect.isclass(cls_class) and issubclass(cls_class, TestCase):
+                    in_test_case = True
 
                 if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
-                    inSetup = True
+                    in_setup = True
 
-            if inTestCase:
-                if inSetup:
+            if in_test_case:
+                if in_setup:
                     # Don't enforce transactions in TestCase setup functions
                     return True
 
