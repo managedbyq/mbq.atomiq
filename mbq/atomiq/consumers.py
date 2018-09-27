@@ -1,35 +1,22 @@
 import importlib
 import json
 import traceback
-from time import sleep
 
 from django.db import transaction
 
 import arrow
 
-import rollbar
-
-from . import _collector, constants, models, utils
+from . import constants, exceptions, models
 
 
 class BaseConsumer(object):
 
-    def run(self):
-        try:
-            with transaction.atomic():
-                task = self.model.objects.available_for_processing()[:1].select_for_update().get()
-                execution_started_at = arrow.utcnow()
-                self.process_task(task)
-                execution_ended_at = arrow.utcnow()
-            self.send_task_execution_metrics(task, execution_started_at, execution_ended_at)
-        except self.model.DoesNotExist:
-            sleep(0.5)
-        except Exception:
-            rollbar.report_exc_info()
-            sleep(0.5)
+    @transaction.atomic
+    def process_one_task(self):
+        task = self.get_next_enqueued_task()
 
-    def process_task(self, task):
         task.number_of_attempts += 1
+
         try:
             self.publish(task)
         except Exception as e:
@@ -40,46 +27,26 @@ class BaseConsumer(object):
                 task.failed_at = arrow.utcnow().datetime
                 task.error_message = str(e)
                 task.stacktrace = traceback.format_exc()
-                rollbar.report_exc_info()
             else:
                 # Task will be retried. It will be put back on the queue and made
                 # invisible to the consumer using an exponential backoff policy.
                 backoff_time = 2**task.number_of_attempts
                 task.visible_after = arrow.utcnow().shift(seconds=backoff_time).datetime
         else:
-            # Task execution succeeded.
             task.state = constants.TaskStates.SUCCEEDED
             task.succeeded_at = arrow.utcnow().datetime
 
         task.save()
 
-    def send_task_execution_metrics(self, task, execution_started_at, execution_ended_at):
-        dd_tags = {
-            'end_state': task.state,
-            'result': 'success' if task.state == constants.TaskStates.SUCCEEDED else 'error',
-            'queue_type': self.queue_type,
-        }
-        _collector.increment(
-            'task',
-            tags=dd_tags,
-        )
+        return task
 
-        _collector.timing(
-            'task.wait_time_ms',
-            utils.time_difference_ms(task.visible_after, execution_started_at),
-            tags=dd_tags,
-        )
-        _collector.timing(
-            'task.execution_time_ms',
-            utils.time_difference_ms(execution_started_at, execution_ended_at),
-            tags=dd_tags,
-        )
-        if task.state == constants.TaskStates.SUCCEEDED:
-            _collector.timing(
-                'task.turnaround_time_ms',
-                utils.time_difference_ms(task.created_at, task.succeeded_at),
-                tags=dd_tags,
-            )
+    def get_next_enqueued_task(self):
+        task = self.model.objects.available_for_processing()[:1].select_for_update().first()
+
+        if not task:
+            raise exceptions.NoAvailableTasksToProcess()
+
+        return task
 
     def publish(self, task):
         raise NotImplementedError('publish must be implemented by subclasses.')

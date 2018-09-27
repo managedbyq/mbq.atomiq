@@ -5,6 +5,8 @@ import time
 from django.db import transaction
 from django.test import TestCase
 
+import rollbar
+
 
 def time_difference_ms(start_datetime, end_datetime):
     diff_in_seconds = (end_datetime - start_datetime).total_seconds()
@@ -94,3 +96,16 @@ def _frame_locals_contains_testcase_class(frame):
             return True
 
     return False
+
+
+def send_errors_to_rollbar(func):
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception:
+            rollbar.report_exc_info()
+            raise
+
+    return wrapper
