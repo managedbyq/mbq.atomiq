@@ -2,7 +2,7 @@ from django.core.management import call_command
 from django.test import TestCase
 
 import arrow
-from mbq.atomiq import constants, models
+from mbq.atomiq import constants, exceptions, models
 from mbq.atomiq.management.commands import atomic_run_consumer
 from tests.compat import mock
 
@@ -34,7 +34,7 @@ class RunConsumerCommandTest(TestCase):
     @mock.patch('mbq.atomiq.consumers.CeleryConsumer.process_one_task')
     def test_sleeps_when_queue_is_empty(self, process_task, sleep, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, False]
-        process_task.side_effect = models.SQSTask.DoesNotExist
+        process_task.side_effect = exceptions.NoAvailableTasksToProcess
         call_command('atomic_run_consumer', '--queue=sqs')
         self.assertEqual(sleep.call_count, 1)
 

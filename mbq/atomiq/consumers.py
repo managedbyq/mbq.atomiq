@@ -6,14 +6,14 @@ from django.db import transaction
 
 import arrow
 
-from . import constants, models
+from . import constants, exceptions, models
 
 
 class BaseConsumer(object):
 
     @transaction.atomic
     def process_one_task(self):
-        task = self.model.objects.available_for_processing()[:1].select_for_update().get()
+        task = self.get_next_enqueued_task()
 
         task.number_of_attempts += 1
 
@@ -37,6 +37,14 @@ class BaseConsumer(object):
             task.succeeded_at = arrow.utcnow().datetime
 
         task.save()
+
+        return task
+
+    def get_next_enqueued_task(self):
+        try:
+            task = self.model.objects.available_for_processing()[:1].select_for_update().get()
+        except self.model.DoesNotExist:
+            raise exceptions.NoAvailableTasksToProcess()
 
         return task
 

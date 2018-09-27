@@ -8,7 +8,7 @@ import arrow
 
 import rollbar
 
-from ... import _collector, constants, consumers, utils
+from ... import _collector, constants, consumers, exceptions, utils
 
 
 class SignalHandler():
@@ -121,7 +121,7 @@ class Command(BaseCommand):
                     execution_start = arrow.utcnow().datetime
                     processed_task = consumer.process_one_task()
                     execution_end = arrow.utcnow().datetime
-                except Consumer.model.DoesNotExist:
+                except exceptions.NoAvailableTasksToProcess:
                     sleep(1)
                 except Exception:
                     rollbar.report_exc_info()
