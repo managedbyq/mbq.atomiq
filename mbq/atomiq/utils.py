@@ -39,8 +39,13 @@ def has_user_transactions_in_django_test_case():
     to make sure nobody ships code that is going to throw this exception in production.
     The problem is that Django TestCase wraps all test functions in a transaction, which
     masks this error. Therefore, we use this function to ~inspect~ ~the~ ~stack~ and look for
-    instances of django.test.TestCase. If we find TestCase unit test, then we expect there to be
-    TWO transactions created by Django, and ONE transaction created by the user.
+    instances of django.test.TestCase.
+
+    1. If we are in a TestCase unit test function, we expect to find 3 transactions total:
+    two created by Django and one by the user.
+
+    2. If we are in the TestCase setUpClass function, we expect to find 2 transactions:
+    one created by Django and by the user.
 
     Thanks for listening.
     Your pal,
