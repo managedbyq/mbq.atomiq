@@ -1,6 +1,6 @@
-import time
 from functools import wraps
 import inspect
+import time
 
 from django.db import transaction
 from django.test import TestCase
