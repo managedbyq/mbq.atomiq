@@ -48,8 +48,9 @@ class BaseProducer(object):
         So when we're running in test mode, we are going to check the number of existing
         save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
         """
-        if RUNNING_TESTS:
-            å
+        if RUNNING_TESTS and not utils.has_user_transactions_in_django_test_case():
+            return False
+
         return True
 
     def _transaction_check(self):
