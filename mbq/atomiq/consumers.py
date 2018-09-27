@@ -1,15 +1,12 @@
 import importlib
 import json
 import traceback
-from time import sleep
 
 from django.db import transaction
 
 import arrow
 
-import rollbar
-
-from . import _collector, constants, models, utils
+from . import constants, models
 
 
 class BaseConsumer(object):
