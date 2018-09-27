@@ -34,6 +34,28 @@ def debounce(seconds=None, minutes=None, hours=None):
 
 
 def has_user_transactions_in_django_test_case():
+    """
+    Hello,
+
+    Before we get started I'd like to formaly apologize for the code you are about to read.
+    We didn't think it would have to be this way.
+
+    Anyways.
+
+    Atomiq publish will throw an exception if not used within a transaction, and we want
+    to make sure nobody ships code that is going to throw this exception in production.
+    The problem is that Django TestCase wraps all test functions in a transaction, which
+    masks this error. Therefore, we use this function to ~inspect~ ~the~ ~stack~ and look for
+    instances of django.test.TestCase. If we find TestCase, then we expect there to be
+    TWO transactions created by the TestCase class, and ONE transaction created by the user.
+    (the exception being that we're in a setup function, in which case don't check for transactions)
+
+    Thanks for listening.
+    Your pal,
+
+    Per-Andre
+
+    """
     in_setup = False
     in_test_case = False
 
