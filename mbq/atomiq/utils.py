@@ -80,7 +80,7 @@ def has_user_transactions_in_django_test_case():
     if in_test_case:
         if in_setup:
             # 0 savepoint IDs implies there is only 1 transaction. We expect 2:
-            # one transaction from setUpclass and one user transaction.
+            # one from setUpclass and one user transaction.
             if len(db_connection.savepoint_ids) == 0:
                 return False
         elif len(db_connection.savepoint_ids) in [0, 1]:
