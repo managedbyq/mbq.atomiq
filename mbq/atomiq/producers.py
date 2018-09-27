@@ -4,7 +4,7 @@ import sys
 
 from django.db import transaction
 
-from . import exceptions, models
+from . import exceptions, models, utils
 
 
 logger = logging.getLogger(__name__)
@@ -48,9 +48,8 @@ class BaseProducer(object):
         So when we're running in test mode, we are going to check the number of existing
         save points and expect there at least to be 2: 1 from TestCase and 1 user-defined.
         """
-        if RUNNING_TESTS:
-            if len(db_connection.savepoint_ids) < 2:
-                return False
+        if RUNNING_TESTS and not utils.has_user_transactions_in_django_test_case():
+            return False
 
         return True
 

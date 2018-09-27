@@ -9,7 +9,7 @@ def run_tests():
     os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
     django.setup()
     test_runner = DiscoverRunner(keepdb=True)
-    failures = test_runner.run_tests(['tests'])
+    failures = test_runner.run_tests(['tests.test_producers'])
     sys.exit(bool(failures))
 
 

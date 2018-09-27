@@ -9,12 +9,49 @@ from mbq.atomiq import constants, exceptions, models, producers
 from tests.compat import mock
 
 
-class TransactionCheckTest(SimpleTestCase):
+class DjangoSimpleTestCaseTest(SimpleTestCase):
     allow_database_queries = True
 
-    def test_outside_of_transaction(self):
+    @classmethod
+    def setUpTestData(cls):
+        producer = producers.BaseProducer()
+        assert not producer._is_running_within_transaction()
+        with transaction.atomic():
+            assert producer._is_running_within_transaction()
+
+    def setUp(self):
         producer = producers.BaseProducer()
         self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
+
+    def test_unittest_transaction(self):
+        producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
+
+
+class DjangoTestCaseTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        producer = producers.BaseProducer()
+        assert not producer._is_running_within_transaction()
+        with transaction.atomic():
+            assert producer._is_running_within_transaction()
+
+    def setUp(self):
+        producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
+
+    def test_unittest_transaction(self):
+        producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
 
 
 class SNSProducerTest(TestCase):
@@ -79,8 +116,7 @@ class SQSProducerTest(TestCase):
 
 class CeleryProducerTest(TestCase):
     @classmethod
-    def setUpClass(cls):
-        super(CeleryProducerTest, cls).setUpClass()
+    def setUpTestData(cls):
         cls.mock_task = mock.Mock()
 
     def test_outside_of_transaction(self):
