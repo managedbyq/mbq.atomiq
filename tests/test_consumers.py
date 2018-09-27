@@ -44,7 +44,6 @@ class ProcessTasksTest(TestCase):
                 attempt += 1
                 frozen_time.tick(delta=(expected_visible_after - arrow.utcnow()))
 
-
     def test_process_tasks_with_final_failure(self, publish):
         # Change number_of_attempts so the consumer thinks this is the last retry
         task = SNSTask.objects.create()

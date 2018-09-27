@@ -15,18 +15,21 @@ class RunConsumerCommandTest(TestCase):
     @mock.patch('mbq.atomiq.consumers.SNSConsumer.process_one_task')
     def test_run_consumer_sns(self, process_one_task, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
+        process_one_task.return_value = models.SNSTask.objects.create()
         call_command('atomic_run_consumer', '--queue=sns')
         self.assertEqual(process_one_task.call_count, 2)
 
     @mock.patch('mbq.atomiq.consumers.SQSConsumer.process_one_task')
     def test_run_consumer_sqs(self, process_one_task, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
+        process_one_task.return_value = models.SNSTask.objects.create()
         call_command('atomic_run_consumer', '--queue=sqs')
         self.assertEqual(process_one_task.call_count, 2)
 
     @mock.patch('mbq.atomiq.consumers.CeleryConsumer.process_one_task')
     def test_run_consumer_celery(self, process_one_task, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
+        process_one_task.return_value = models.SNSTask.objects.create()
         call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
         self.assertEqual(process_one_task.call_count, 2)
 
@@ -132,8 +135,8 @@ class CollectMetricsTest(TestCase):
             'queue_type': constants.QueueType.SNS,
         }
 
-        execution_started_at = arrow.utcnow().shift(seconds=0.123)
-        execution_ended_at = arrow.utcnow().shift(seconds=0.579)
+        execution_started_at = arrow.utcnow().shift(seconds=0.123).datetime
+        execution_ended_at = arrow.utcnow().shift(seconds=0.579).datetime
 
         command.collect_task_metrics(
             constants.QueueType.SNS,
@@ -180,8 +183,8 @@ class CollectMetricsTest(TestCase):
             'queue_type': 'sns',
         }
 
-        execution_started_at = arrow.utcnow().shift(seconds=0.123)
-        execution_ended_at = arrow.utcnow().shift(seconds=0.579)
+        execution_started_at = arrow.utcnow().shift(seconds=0.123).datetime
+        execution_ended_at = arrow.utcnow().shift(seconds=0.579).datetime
 
         command.collect_task_metrics(
             constants.QueueType.SNS,
