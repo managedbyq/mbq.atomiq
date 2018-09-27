@@ -100,7 +100,7 @@ def _frame_locals_contains_testcase_class(frame):
 
 def send_errors_to_rollbar(func):
 
-    @wraps(func)
+    @functools.wraps(func)
     def wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
