@@ -40,7 +40,7 @@ def has_user_transactions_in_django_test_case():
     Before we get started I'd like to formaly apologize for the code you are about to read.
     We didn't think it would have to be this way.
 
-    Anyways.
+    Anyways, on to the main point.
 
     Atomiq publish will throw an exception if not used within a transaction, and we want
     to make sure nobody ships code that is going to throw this exception in production.
