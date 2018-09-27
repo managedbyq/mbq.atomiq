@@ -13,8 +13,8 @@ import freezegun
 class ProcessTasksTest(TestCase):
 
     @classmethod
-    def setUpTestData(self):
-        self.consumer = consumers.SNSConsumer()
+    def setUpTestData(cls):
+        cls.consumer = consumers.SNSConsumer()
 
     def test_process_tasks_successfully(self, publish):
         task = SNSTask.objects.create()

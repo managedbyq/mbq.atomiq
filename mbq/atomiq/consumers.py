@@ -41,9 +41,9 @@ class BaseConsumer(object):
         return task
 
     def get_next_enqueued_task(self):
-        try:
-            task = self.model.objects.available_for_processing()[:1].select_for_update().get()
-        except self.model.DoesNotExist:
+        task = self.model.objects.available_for_processing()[:1].select_for_update().first()
+
+        if not task:
             raise exceptions.NoAvailableTasksToProcess()
 
         return task
