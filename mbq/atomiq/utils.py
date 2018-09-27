@@ -64,7 +64,7 @@ def has_user_transactions_in_django_test_case():
     # This loops through the call stack and sets "in_setup" and "in_test_case"
     for stack_frame in inspect.stack():
         for local_var in stack_frame[0].f_locals.values():
-            if stack_frame[3] in ['setUpTestData', 'setUp', 'setUpClass']:
+            if stack_frame[3] in ['setUpTestData', 'setUpclass']:
                 in_setup = True
 
             if not local_var:
@@ -77,9 +77,16 @@ def has_user_transactions_in_django_test_case():
                 if inspect.isclass(var_class) and issubclass(var_class, TestCase):
                     in_test_case = True
 
-    if in_test_case and not in_setup and len(db_connection.savepoint_ids) < 2:
-        # Don't enforce transactions in TestCase setup functions
-        # Enforce 1 user transaction + 2 test transactions in Django TestCase unit tests
-        return False
+    if in_test_case:
+        if in_setup:
+            # 0 savepoint IDs implies there is only 1 transaction. We expect 2:
+            # 1 transaction from setUpclass and 1 user transaction.
+            if len(db_connection.savepoint_ids) == 0:
+                return False
+        elif len(db_connection.savepoint_ids) in [0, 1]:
+            # One savepoint ID implies there are 2 transactions.
+            # Here we expect 3 transactions:
+            # 1 from setUpClass, 1 wrapping the unit test, and 1 user transaction.
+            return False
 
     return True
