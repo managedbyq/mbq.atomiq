@@ -61,4 +61,3 @@ def has_user_transactions_in_django_test_case():
         return False
 
     return True
->>>>>>> wip gotta gooooo
