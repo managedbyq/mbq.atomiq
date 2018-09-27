@@ -56,6 +56,8 @@ def has_user_transactions_in_django_test_case():
     in_testcase_setupclass = False
     in_testcase = False
     db_connection = transaction.get_connection()
+    if not db_connection.in_atomic_block:
+        return False
 
     for frame in inspect.stack():
         if frame[3] == 'setUpClass':
