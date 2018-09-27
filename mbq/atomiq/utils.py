@@ -1,4 +1,4 @@
-from functools import wraps
+import functools
 import inspect
 import time
 
@@ -23,7 +23,7 @@ def debounce(seconds=None, minutes=None, hours=None):
         if hours:
             func.seconds_between_runs += hours * 60 * 60
 
-        @wraps(func)
+        @functools.wraps(func)
         def wrapped_func(*args, **kwargs):
             if func.last_run + func.seconds_between_runs < time.time():
                 func(*args, **kwargs)
@@ -48,37 +48,42 @@ def has_user_transactions_in_django_test_case():
     Per-Andre
 
     """
-    in_setup = False
-    in_test_case = False
-
+    in_testcase_setupclass = False
+    in_testcase = False
     db_connection = transaction.get_connection()
 
-    # This loops through the call stack and sets "in_setup" and "in_test_case"
-    for stack_frame in inspect.stack():
-        for local_var in stack_frame[0].f_locals.values():
-            if stack_frame[3] in ['setUpTestData', 'setUpclass']:
-                in_setup = True
+    for frame in inspect.stack():
+        if frame[3] == 'setUpClass':
+            if _frame_locals_contains_testcase_class(frame):
+                in_testcase_setupclass = True
+                in_testcase = True
+                break
 
-            if not local_var:
-                continue
+        if _frame_locals_contains_testcase_instance(frame):
+            in_testcase = True
 
-            if inspect.isclass(local_var) and issubclass(local_var, TestCase):
-                in_test_case = True
-            else:
-                var_class = getattr(local_var, '__class__', None)
-                if inspect.isclass(var_class) and issubclass(var_class, TestCase):
-                    in_test_case = True
-
-    if in_test_case:
-        if in_setup:
-            # 0 savepoint IDs implies there is only 1 transaction. We expect 2:
-            # one from setUpclass and one user transaction.
-            if len(db_connection.savepoint_ids) == 0:
-                return False
-        elif len(db_connection.savepoint_ids) in [0, 1]:
-            # One savepoint ID implies there are 2 transactions.
-            # Here we expect 3 transactions:
-            # one from setUpClass, one wrapping the unit test, and one user transaction.
+    number_of_transactions = len(db_connection.savepoint_ids) + 1
+    if in_testcase_setupclass:
+        if number_of_transactions < 2:
+            return False
+    elif in_testcase:
+        if number_of_transactions < 3:
             return False
 
     return True
+
+
+def _frame_locals_contains_testcase_instance(frame):
+    for local_var in frame[0].f_locals.values():
+        if isinstance(local_var, TestCase):
+            return True
+
+    return False
+
+
+def _frame_locals_contains_testcase_class(frame):
+    for local_var in frame[0].f_locals.values():
+        if inspect.isclass(local_var) and issubclass(local_var, TestCase):
+            return True
+
+    return False

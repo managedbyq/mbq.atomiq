@@ -12,12 +12,22 @@ from tests.compat import mock
 class DjangoSimpleTestCaseTest(SimpleTestCase):
     allow_database_queries = True
 
-    def test_outside_of_transaction(self):
+    @classmethod
+    def setUpTestData(cls):
+        producer = producers.BaseProducer()
+        assert not producer._is_running_within_transaction()
+        with transaction.atomic():
+            assert producer._is_running_within_transaction()
+
+    def setUp(self):
         producer = producers.BaseProducer()
         self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
 
-    def test_in_transaction(self):
+    def test_unittest_transaction(self):
         producer = producers.BaseProducer()
+        self.assertFalse(producer._is_running_within_transaction())
         with transaction.atomic():
             self.assertTrue(producer._is_running_within_transaction())
 
@@ -27,18 +37,19 @@ class DjangoTestCaseTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         producer = producers.BaseProducer()
-        assert producer._is_running_within_transaction()
+        assert not producer._is_running_within_transaction()
+        with transaction.atomic():
+            assert producer._is_running_within_transaction()
 
     def setUp(self):
         producer = producers.BaseProducer()
-        self.assertTrue(producer._is_running_within_transaction())
+        self.assertFalse(producer._is_running_within_transaction())
+        with transaction.atomic():
+            self.assertTrue(producer._is_running_within_transaction())
 
-    def test_outside_of_transaction(self):
+    def test_unittest_transaction(self):
         producer = producers.BaseProducer()
         self.assertFalse(producer._is_running_within_transaction())
-
-    def test_in_transaction(self):
-        producer = producers.BaseProducer()
         with transaction.atomic():
             self.assertTrue(producer._is_running_within_transaction())
 
