@@ -80,7 +80,7 @@ class Command(BaseCommand):
             'queue_type': queue,
         }
 
-         _collector.increment(
+        _collector.increment(
             'task',
             tags=tags,
         )
