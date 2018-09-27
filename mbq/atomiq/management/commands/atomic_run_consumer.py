@@ -104,39 +104,35 @@ class Command(BaseCommand):
                 tags=tags,
             )
 
+    @utils.send_errors_to_rollbar
     def handle(self, *args, **options):
-        try:
-            queue_type = options['queue']
+        queue_type = options['queue']
 
-            Consumer = self.consumers[queue_type]
+        Consumer = self.consumers[queue_type]
 
-            consumer_kwargs = {}
-            if queue_type == constants.QueueType.CELERY:
-                consumer_kwargs['celery_app'] = options['celery_app']
+        consumer_kwargs = {}
+        if queue_type == constants.QueueType.CELERY:
+            consumer_kwargs['celery_app'] = options['celery_app']
 
-            consumer = Consumer(**consumer_kwargs)
+        consumer = Consumer(**consumer_kwargs)
 
-            while self.signal_handler.should_continue():
-                try:
-                    execution_start = arrow.utcnow().datetime
-                    processed_task = consumer.process_one_task()
-                    execution_end = arrow.utcnow().datetime
-                except exceptions.NoAvailableTasksToProcess:
-                    sleep(1)
-                except Exception:
-                    rollbar.report_exc_info()
-                    sleep(1)
-                else:
-                    self.collect_task_metrics(
-                        queue_type,
-                        processed_task,
-                        execution_start,
-                        execution_end,
-                    )
-                finally:
-                    self.collect_queue_metrics(**options)
-                    self.run_delayed_cleanup(**options)
-
-        except Exception:
-            rollbar.report_exc_info()
-            raise
+        while self.signal_handler.should_continue():
+            try:
+                execution_start = arrow.utcnow().datetime
+                processed_task = consumer.process_one_task()
+                execution_end = arrow.utcnow().datetime
+            except exceptions.NoAvailableTasksToProcess:
+                sleep(1)
+            except Exception:
+                rollbar.report_exc_info()
+                sleep(1)
+            else:
+                self.collect_task_metrics(
+                    queue_type,
+                    processed_task,
+                    execution_start,
+                    execution_end,
+                )
+            finally:
+                self.collect_queue_metrics(**options)
+                self.run_delayed_cleanup(**options)
