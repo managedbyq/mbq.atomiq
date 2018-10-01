@@ -90,6 +90,9 @@ We now use `tox` for local testing across multiple python environments. Before t
 .. code-block:: bash
 
     $ docker-compose up py36|py27|py37|pypy3
+Testing in Other Services
+-------------------------
+When using atomiq in other services, we don't want to mock out atomiq's publish functions. This is because atomiq includes functionality to check that all usages are wrapped in a transaction, and can account for transactions added by Django in test cases. To allow you to test that the tasks you expect have been added the queue, we expose a `test_utils` module. 
 
 
 Shipping a New Release
