@@ -7,7 +7,8 @@ from tests.compat import mock
 
 class CeleryTestUtilsTest(TestCase):
 
-    def setUp(cls):
+    @classmethod
+    def setUpTestData(cls):
         cls.task = mock.Mock()
         cls.task.name = 'test_task_name'
 
@@ -49,7 +50,8 @@ class CeleryTestUtilsTest(TestCase):
 
 class SNSTestUtilsTest(TestCase):
 
-    def setUp(cls):
+    @classmethod
+    def setUpTestData(cls):
         cls.payload = [
             {'key1': 1, 'key2': 'b', 'key3': 3.1, 'key4': [], 'key5': {}},
             {'key6': 2, 'key7': 'g', 'key8': 4.2, 'key9': [], 'key10': {}},
@@ -80,7 +82,8 @@ class SNSTestUtilsTest(TestCase):
 
 class SQSTestUtilsTest(TestCase):
 
-    def setUp(cls):
+    @classmethod
+    def setUpTestData(cls):
         cls.payload = [
             {'key1': 1, 'key2': 'b', 'key3': 3.1, 'key4': [], 'key5': {}},
             {'key6': 2, 'key7': 'g', 'key8': 4.2, 'key9': [], 'key10': {}},
