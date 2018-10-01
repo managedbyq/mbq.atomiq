@@ -9,7 +9,7 @@ class AtomiqConfig(AppConfig):
         from django.conf import settings
         from django.core.exceptions import ImproperlyConfigured
         import mbq.metrics
-        from . import producers
+        from . import producers, test_utils
 
         service = settings.ATOMIQ.get('service')
         env = settings.ATOMIQ.get('env')
@@ -38,3 +38,4 @@ class AtomiqConfig(AppConfig):
         self.module.sqs_publish = sqs_producer.publish
         celery_producer = producers.CeleryProducer()
         self.module.celery_publish = celery_producer.publish
+        self.module.test_utils = test_utils
