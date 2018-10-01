@@ -1,38 +1,25 @@
 from . import constants, models
 
 
-def celery_publish_call(task, *args, **kwargs):
+def get_celery_publish_args(task):
     tasks = models.CeleryTask.objects.filter(
         state=constants.TaskStates.ENQUEUED,
         task_name=task.name,
     )
-    if args or kwargs:
-        tasks = tasks.filter(
-            task_arguments={
-                'args': args,
-                'kwargs': kwargs,
-            }
-        )
-    return tasks.exists()
+    return [task.task_arguments for task in tasks]
 
 
-def sns_publish_call(topic_arn, payload=None):
+def get_sns_publish_payloads(topic_arn):
     tasks = models.SNSTask.objects.filter(
         state=constants.TaskStates.ENQUEUED,
         topic_arn=topic_arn,
     )
-    if payload:
-        tasks = tasks.filter(payload=payload)
-
-    return tasks.exists()
+    return [task.payload for task in tasks]
 
 
-def sqs_publish_call(queue_url, payload=None):
+def get_sqs_publish_payloads(queue_url):
     tasks = models.SQSTask.objects.filter(
         state=constants.TaskStates.ENQUEUED,
         queue_url=queue_url,
     )
-    if payload:
-        tasks = tasks.filter(payload=payload)
-
-    return tasks.exists()
+    return [task.payload for task in tasks]
