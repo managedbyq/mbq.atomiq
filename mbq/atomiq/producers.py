@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import importlib
 import logging
 import sys
@@ -73,6 +75,15 @@ class SNSProducer(BaseProducer):
     required_dependencies = ['boto3']
 
     def _create_task(self, topic_arn, payload):
+        if not isinstance(topic_arn, str):
+            raise ValueError(
+                'Atomiq sns_publish got a non string "topic_arn" argument: {}'.format(topic_arn)
+            )
+        if not payload or not isinstance(payload, dict):
+            raise ValueError(
+                'Atomiq sns_publish got an empty or non dict "payload" argument: {}'.format(payload)
+            )
+
         return models.SNSTask.objects.create(
             topic_arn=topic_arn,
             payload=payload,
@@ -83,6 +94,15 @@ class SQSProducer(BaseProducer):
     required_dependencies = ['boto3']
 
     def _create_task(self, queue_url, payload):
+        if not isinstance(queue_url, str):
+            raise ValueError(
+                'Atomiq sqs_publish got a non string "queue_url" argument: {}'.format(queue_url)
+            )
+        if not payload or not isinstance(payload, dict):
+            raise ValueError(
+                'Atomiq sqs_publish got an empty or non dict "payload" argument: {}'.format(payload)
+            )
+
         return models.SQSTask.objects.create(
             queue_url=queue_url,
             payload=payload,
@@ -93,6 +113,12 @@ class CeleryProducer(BaseProducer):
     required_dependencies = ['celery']
 
     def _create_task(self, task, *args, **kwargs):
+        if not task or not hasattr(task, 'name') or not isinstance(task.name, str):
+            raise ValueError(
+                'Atomiq celery_publish expects a "task" argument with a string "name" attribute. '
+                'Got task: {}'.format(task)
+            )
+
         return models.CeleryTask.objects.create(
             task_name=task.name,
             task_arguments={
