@@ -99,15 +99,12 @@ class SNSProducerTest(TestCase):
             with self.assertRaises(ValueError):
                 mbq.atomiq.sns_publish(None, payload)
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sns_publish('topic', None)
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sns_publish('topic', [])
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sns_publish('topic', {})
 
@@ -157,15 +154,12 @@ class SQSProducerTest(TestCase):
             with self.assertRaises(ValueError):
                 mbq.atomiq.sqs_publish(None, payload)
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sqs_publish('topic', None)
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sqs_publish('topic', [])
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.sqs_publish('topic', {})
 
@@ -218,6 +212,5 @@ class CeleryProducerTest(TestCase):
             with self.assertRaises(ValueError):
                 mbq.atomiq.celery_publish(None)
 
-        with transaction.atomic():
             with self.assertRaises(ValueError):
                 mbq.atomiq.celery_publish(mock.Mock())
