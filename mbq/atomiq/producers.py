@@ -75,11 +75,12 @@ class SNSProducer(BaseProducer):
     def _create_task(self, topic_arn, payload):
         if not topic_arn or not isinstance(topic_arn, str):
             raise ValueError(
-                'Atomiq sns_publish got a non string "topic_arn" argument: {}'.format(topic_arn)
+                'Atomiq SNS publish expects a string "topic_arn" argument.'
+                'Got {}'.format(topic_arn)
             )
-        if not payload or not isinstance(payload, dict):
+        if not payload:
             raise ValueError(
-                'Atomiq sns_publish got an empty or non dict "payload" argument: {}'.format(payload)
+                'Atomiq SNS publish expects a non-empty "payload" argument.'
             )
 
         return models.SNSTask.objects.create(
@@ -94,11 +95,12 @@ class SQSProducer(BaseProducer):
     def _create_task(self, queue_url, payload):
         if not queue_url or not isinstance(queue_url, str):
             raise ValueError(
-                'Atomiq sqs_publish got a non string "queue_url" argument: {}'.format(queue_url)
+                'Atomiq SQS publish expects a string "queue_url" argument.'
+                'Got {}'.format(queue_url)
             )
-        if not payload or not isinstance(payload, dict):
+        if not payload:
             raise ValueError(
-                'Atomiq sqs_publish got an empty or non dict "payload" argument: {}'.format(payload)
+                'Atomiq SQS publish expects a non-empty "payload" argument.'
             )
 
         return models.SQSTask.objects.create(
@@ -111,10 +113,10 @@ class CeleryProducer(BaseProducer):
     required_dependencies = ['celery']
 
     def _create_task(self, task, *args, **kwargs):
-        if not task or not hasattr(task, 'name') or not task.name or not isinstance(task.name, str):
+        if (not task or not hasattr(task, 'name')
+                or not isinstance(task.name, str) or not task.name):
             raise ValueError(
-                'Atomiq celery_publish expects a "task" argument with a string "name" attribute. '
-                'Got task: {}'.format(task)
+                'Atomiq Celery publish expects a "task" argument with a string "name" attribute.'
             )
 
         return models.CeleryTask.objects.create(
