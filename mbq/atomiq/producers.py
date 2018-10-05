@@ -73,7 +73,7 @@ class SNSProducer(BaseProducer):
     required_dependencies = ['boto3']
 
     def _create_task(self, topic_arn, payload):
-        if not isinstance(topic_arn, str):
+        if not topic_arn or not isinstance(topic_arn, str):
             raise ValueError(
                 'Atomiq sns_publish got a non string "topic_arn" argument: {}'.format(topic_arn)
             )
@@ -92,7 +92,7 @@ class SQSProducer(BaseProducer):
     required_dependencies = ['boto3']
 
     def _create_task(self, queue_url, payload):
-        if not isinstance(queue_url, str):
+        if not queue_url or not isinstance(queue_url, str):
             raise ValueError(
                 'Atomiq sqs_publish got a non string "queue_url" argument: {}'.format(queue_url)
             )
@@ -111,7 +111,7 @@ class CeleryProducer(BaseProducer):
     required_dependencies = ['celery']
 
     def _create_task(self, task, *args, **kwargs):
-        if not task or not hasattr(task, 'name') or not isinstance(task.name, str):
+        if not task or not hasattr(task, 'name') or not task.name or not isinstance(task.name, str):
             raise ValueError(
                 'Atomiq celery_publish expects a "task" argument with a string "name" attribute. '
                 'Got task: {}'.format(task)
