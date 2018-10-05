@@ -103,13 +103,13 @@ class SNSProducerTest(TestCase):
                 mbq.atomiq.sns_publish('', payload)
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sns_publish('topic', None)
+                mbq.atomiq.sns_publish('topic_arn', None)
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sns_publish('topic', [])
+                mbq.atomiq.sns_publish('topic_arn', [])
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sns_publish('topic', {})
+                mbq.atomiq.sns_publish('topic_arn', {})
 
 
 class SQSProducerTest(TestCase):
@@ -161,13 +161,13 @@ class SQSProducerTest(TestCase):
                 mbq.atomiq.sqs_publish('', payload)
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('topic', None)
+                mbq.atomiq.sqs_publish('queue_arn', None)
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('topic', [])
+                mbq.atomiq.sqs_publish('queue_arn', [])
 
             with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('topic', {})
+                mbq.atomiq.sqs_publish('queue_arn', {})
 
 
 class CeleryProducerTest(TestCase):
