@@ -69,7 +69,7 @@ class SNSProducerTest(TestCase):
                 mbq.atomiq.sns_publish('topic_arn', bad_payload)
 
     def test_message_enqueued(self):
-        unique_topic_arn = uuid.uuid4()
+        unique_topic_arn = str(uuid.uuid4())
         payload = {'payload': 'payload'}
         with transaction.atomic():
             mbq.atomiq.sns_publish(unique_topic_arn, payload)
@@ -82,6 +82,31 @@ class SNSProducerTest(TestCase):
         self.assertIsNone(created_task.failed_at)
         self.assertEqual(created_task.state, constants.TaskStates.ENQUEUED)
         self.assertEqual(created_task.payload, payload)
+
+    def test_unicode_payload(self):
+        unicode_payload = {'value': u'\u2EE5'}
+
+        with transaction.atomic():
+            mbq.atomiq.sns_publish('topic_arn', unicode_payload)
+
+        task = models.SNSTask.objects.get(topic_arn='topic_arn')
+        payload = task.payload
+        self.assertEquals(payload, unicode_payload)
+
+    def test_parameter_validation(self):
+        payload = {'payload': 'payload'}
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sns_publish(None, payload)
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sns_publish('topic_arn', None)
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sns_publish('topic_arn', [])
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sns_publish('topic_arn', {})
 
 
 class SQSProducerTest(TestCase):
@@ -99,7 +124,7 @@ class SQSProducerTest(TestCase):
                 mbq.atomiq.sqs_publish('queue_url', bad_payload)
 
     def test_message_enqueued(self):
-        unique_queue_url = uuid.uuid4()
+        unique_queue_url = str(uuid.uuid4())
         payload = {'payload': 'payload'}
         with transaction.atomic():
             mbq.atomiq.sqs_publish(unique_queue_url, payload)
@@ -113,11 +138,37 @@ class SQSProducerTest(TestCase):
         self.assertEqual(created_task.state, constants.TaskStates.ENQUEUED)
         self.assertEqual(created_task.payload, payload)
 
+    def test_unicode_payload(self):
+        unicode_payload = {'value': u'\u2EE5'}
+
+        with transaction.atomic():
+            mbq.atomiq.sqs_publish('queue_url', unicode_payload)
+
+        task = models.SQSTask.objects.get(queue_url='queue_url')
+        payload = task.payload
+        self.assertEquals(payload, unicode_payload)
+
+    def test_parameter_validation(self):
+        payload = {'payload': 'payload'}
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sqs_publish(None, payload)
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sqs_publish('queue_arn', None)
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sqs_publish('queue_arn', [])
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.sqs_publish('queue_arn', {})
+
 
 class CeleryProducerTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.mock_task = mock.Mock()
+        cls.mock_task.name = 'task_name'
 
     def test_outside_of_transaction(self):
         with self.assertRaises(exceptions.TransactionError):
@@ -131,7 +182,7 @@ class CeleryProducerTest(TestCase):
                 mbq.atomiq.celery_publish(self.mock_task, bad_arg)
 
     def test_message_enqueued(self):
-        unique_task_name = uuid.uuid4()
+        unique_task_name = str(uuid.uuid4())
         self.mock_task.name = unique_task_name
 
         args = [1, 2, True, 'test']
@@ -155,3 +206,11 @@ class CeleryProducerTest(TestCase):
             'args': args,
             'kwargs': kwargs,
         })
+
+    def test_parameter_validation(self):
+        with transaction.atomic():
+            with self.assertRaises(ValueError):
+                mbq.atomiq.celery_publish(None)
+
+            with self.assertRaises(ValueError):
+                mbq.atomiq.celery_publish(mock.Mock())
