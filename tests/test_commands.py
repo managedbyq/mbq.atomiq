@@ -1,10 +1,11 @@
+from unittest import mock
+
 from django.core.management import call_command
 from django.test import TestCase
 
 import arrow
 from mbq.atomiq import constants, exceptions, models
 from mbq.atomiq.management.commands import atomic_run_consumer
-from tests.compat import mock
 
 import freezegun
 

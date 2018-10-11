@@ -1,4 +1,5 @@
 import uuid
+from unittest import mock
 
 from django.db import transaction
 from django.test import SimpleTestCase, TestCase
@@ -6,7 +7,6 @@ from django.test import SimpleTestCase, TestCase
 import arrow
 import mbq.atomiq
 from mbq.atomiq import constants, exceptions, models, producers
-from tests.compat import mock
 
 
 class DjangoSimpleTestCaseTest(SimpleTestCase):
