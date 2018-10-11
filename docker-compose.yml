@@ -2,19 +2,6 @@
 version: '3'
 
 services:
-  py27:
-    build:
-      context: .
-      args:
-        IMAGE: 'python:2.7-stretch'
-    volumes:
-      - .:/app
-    links:
-      - mysql
-    environment:
-      TOX_WORK_DIR: /tox
-      PYTHON_VERSION: py27
-
   py36:
     build:
       context: .

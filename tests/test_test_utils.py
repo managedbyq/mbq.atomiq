@@ -1,8 +1,9 @@
+from unittest import mock
+
 from django.db import transaction
 from django.test import TestCase
 
 from mbq.atomiq import producers, test_utils
-from tests.compat import mock
 
 
 class CeleryTestUtilsTest(TestCase):
