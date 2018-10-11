@@ -19,7 +19,10 @@ delete_tasks.short_description = 'Delete tasks'
 
 
 def retry_tasks(modeladmin, request, queryset):
-    queryset.update(state=constants.TaskStates.ENQUEUED)
+    queryset.update(
+        state=constants.TaskStates.ENQUEUED,
+        visible_after=arrow.utcnow().datetime,
+    )
 
 
 retry_tasks.short_description = 'Retry tasks'
