@@ -13,13 +13,14 @@ python:
 
 env:
   matrix:
-    - DJANGO=1.11
-    - DJANGO=2.0
-    - DJANGO=2.1
-    - DJANGO=master
-  matrix:
-    - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=1.11 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.0 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.1 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=master DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=1.11 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.0 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.1 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=master DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
 
 matrix:
   fast_finish: true
