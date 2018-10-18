@@ -19,7 +19,7 @@ env:
     - DJANGO=master
   matrix:
     - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/atomiq-pg
+    - DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/atomiqpg
 
 matrix:
   fast_finish: true
@@ -31,7 +31,7 @@ matrix:
 
 before_install:
   - mysql -e 'CREATE DATABASE atomiqdb;'
-  - psql -c 'CREATE DATABASE atomiq-pg;' -U postgres
+  - psql -c 'CREATE DATABASE atomiqpg;' -U postgres
 
 install:
   - travis_retry pip install --upgrade pip tox tox-venv tox-travis
