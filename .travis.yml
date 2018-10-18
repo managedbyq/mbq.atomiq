@@ -12,12 +12,12 @@ python:
 
 env:
   matrix:
-    - DJANGO=1.11 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DJANGO=2.0 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DJANGO=2.1 DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DJANGO=1.11 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
-    - DJANGO=2.0 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
-    - DJANGO=2.1 DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=1.11 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=1.11 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.0 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.0 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.1 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.1 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
 
 matrix:
   fast_finish: true
@@ -51,5 +51,5 @@ deploy:
     # on exactly one build, not all py36 builds, and looking for django 1.11 is a cheap
     # way to accomplish that.
     condition: $DJANGO = '1.11'
-    condition: $DATABASE_URL = 'postgres://postgres:@127.0.0.1:5432/atomiqpg'
+    condition: $DB = 'postgres'
     distributions: sdist bdist_wheel
