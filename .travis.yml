@@ -4,6 +4,7 @@ cache: pip
 
 services:
   - mysql
+  - postgresql
 
 python:
   - '3.6'
@@ -16,8 +17,9 @@ env:
     - DJANGO=2.0
     - DJANGO=2.1
     - DJANGO=master
-  global:
+  matrix:
     - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/atomiq-pg
 
 matrix:
   fast_finish: true
@@ -28,7 +30,8 @@ matrix:
     - env: DJANGO=master
 
 before_install:
-  - mysql -e 'CREATE DATABASE atmoiqdb;'
+  - mysql -e 'CREATE DATABASE atomiqdb;'
+  - psql -c 'CREATE DATABASE atomiq-pg;' -U postgres
 
 install:
   - travis_retry pip install --upgrade pip tox tox-venv tox-travis
