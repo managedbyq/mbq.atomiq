@@ -33,7 +33,6 @@ class TaskTest(TestCase):
         )
 
         tasks = SNSTask.objects.available_for_processing()
-        # import pdb; pdb.set_trace()
         self.assertEquals(list(tasks), [
             task_ready_past,
             task_ready_now,
