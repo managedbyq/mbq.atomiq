@@ -27,9 +27,6 @@ matrix:
   include:
     - { python: '3.6', env: TOXENV=lint }
 
-  allow_failures:
-    - env: DJANGO=master
-
 before_install:
   - mysql -e 'CREATE DATABASE atomiqdb;'
   - psql -c 'CREATE DATABASE atomiqpg;' -U postgres
