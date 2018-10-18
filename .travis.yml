@@ -19,7 +19,7 @@ env:
     - DJANGO=master
   matrix:
     - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
-    - DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/atomiqpg
+    - DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
 
 matrix:
   fast_finish: true
