@@ -32,21 +32,6 @@ services:
       DATABASE_URL: 'mysql://root:@mysql:3306/atomiqdb'
     command: tox -e py36-django{111,20,21,master}-mysql
 
-  pypy3-mysql:
-    build:
-      context: .
-      args:
-        IMAGE: 'pypy:3-6-jessie'
-    volumes:
-      - .:/app
-    links:
-      - mysql
-    environment:
-      TOX_WORK_DIR: /tox
-      PYTHON_VERSION: pypy3
-      DATABASE_URL: 'mysql://root:@mysql:3306/atomiqdb'
-    command: tox -e py36-django{111,20,21,master}-mysql
-
   mysql:
     image: mysql:5.6
     environment:
@@ -80,21 +65,6 @@ services:
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py37
-      DATABASE_URL: 'postgres://postgres:postgres@postgres:5432/atomiq-pg'
-    command: tox -e py36-django{111,20,21,master}-pg
-
-  pypy3-pg:
-    build:
-      context: .
-      args:
-        IMAGE: 'pypy:3-6-jessie'
-    volumes:
-      - .:/app
-    links:
-       - postgres
-    environment:
-      TOX_WORK_DIR: /tox
-      PYTHON_VERSION: pypy3
       DATABASE_URL: 'postgres://postgres:postgres@postgres:5432/atomiq-pg'
     command: tox -e py36-django{111,20,21,master}-pg
 
