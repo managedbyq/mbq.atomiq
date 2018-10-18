@@ -4,31 +4,29 @@ cache: pip
 
 services:
   - mysql
+  - postgresql
 
 python:
   - '3.6'
   - '3.7-dev'
-  - 'pypy3'
 
 env:
   matrix:
-    - DJANGO=1.11
-    - DJANGO=2.0
-    - DJANGO=2.1
-    - DJANGO=master
-  global:
-    - DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=1.11 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=1.11 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.0 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.0 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
+    - DJANGO=2.1 DB=mysql DATABASE_URL=mysql://root:@127.0.0.1:3306/atomiqdb
+    - DJANGO=2.1 DB=postgres DATABASE_URL=postgres://postgres:@127.0.0.1:5432/atomiqpg
 
 matrix:
   fast_finish: true
   include:
     - { python: '3.6', env: TOXENV=lint }
 
-  allow_failures:
-    - env: DJANGO=master
-
 before_install:
-  - mysql -e 'CREATE DATABASE atmoiqdb;'
+  - mysql -e 'CREATE DATABASE atomiqdb;'
+  - psql -c 'CREATE DATABASE atomiqpg;' -U postgres
 
 install:
   - travis_retry pip install --upgrade pip tox tox-venv tox-travis
@@ -53,4 +51,5 @@ deploy:
     # on exactly one build, not all py36 builds, and looking for django 1.11 is a cheap
     # way to accomplish that.
     condition: $DJANGO = '1.11'
+    condition: $DB = 'postgres'
     distributions: sdist bdist_wheel

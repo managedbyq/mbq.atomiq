@@ -18,7 +18,6 @@ class TaskTest(TestCase):
         # deleted task
         SNSTask.objects.create(state=TaskStates.DELETED)
 
-        task_ready = SNSTask.objects.create(state=TaskStates.ENQUEUED)
         task_ready_past = SNSTask.objects.create(
             state=TaskStates.ENQUEUED,
             visible_after=arrow.utcnow().shift(seconds=-1).datetime,
@@ -36,6 +35,5 @@ class TaskTest(TestCase):
         tasks = SNSTask.objects.available_for_processing()
         self.assertEquals(list(tasks), [
             task_ready_past,
-            task_ready,
             task_ready_now,
         ])
