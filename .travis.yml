@@ -57,4 +57,5 @@ deploy:
     # on exactly one build, not all py36 builds, and looking for django 1.11 is a cheap
     # way to accomplish that.
     condition: $DJANGO = '1.11'
+    condition: $DATABASE_URL = 'postgres://postgres:@127.0.0.1:5432/atomiqpg'
     distributions: sdist bdist_wheel
