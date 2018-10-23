@@ -26,7 +26,7 @@ class SignalHandler():
 class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
-        super(BaseCommand, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.signal_handler = SignalHandler()
         signal.signal(signal.SIGINT, self.signal_handler.handle_signal)

@@ -31,12 +31,12 @@ retry_tasks.short_description = 'Retry tasks'
 class BaseTaskAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
-        qs = super(BaseTaskAdmin, self).get_queryset(request)
+        qs = super().get_queryset(request)
         return qs.filter(state=constants.TaskStates.FAILED)
 
     # disabling the delete action on the listview
     def get_actions(self, request):
-        actions = super(BaseTaskAdmin, self).get_actions(request)
+        actions = super().get_actions(request)
         if 'delete_selected' in actions:
             del actions['delete_selected']
         return actions
