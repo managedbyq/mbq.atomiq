@@ -51,19 +51,7 @@ notice that celery consumer requires an additional arg `celery-app`. This should
 
     celery_app = Celery(NAME)
 
-To make sure we're not holding on to successfully executed or deleted tasks we also have a clean up management command, that by default will clean up all processed tasks that are older than 30 days. That default can be overriden.
-
-.. code-block:: bash
-
-    python -m manage atomic_cleanup_old_tasks
-
-    or
-
-    python -m manage atomic_cleanup_old_tasks --days N
-
-    or
-
-    python -m manage atomic_cleanup_old_tasks --minutes N
+To make sure we're not holding on to successfully executed or deleted tasks forever, our consumer management command intermittendly runs a script to delete tasks more than 30 days old.
 
 4. Use it!
 
