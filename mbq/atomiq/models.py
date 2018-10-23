@@ -11,7 +11,7 @@ from . import constants
 
 class TaskManager(models.Manager):
     def available_for_processing(self):
-        return super(TaskManager, self).get_queryset().filter(
+        return super().get_queryset().filter(
             state=constants.TaskStates.ENQUEUED,
             visible_after__lte=arrow.utcnow().datetime,
         ).order_by('visible_after')
