@@ -45,7 +45,7 @@ Getting started
 
     python -m manage atomic_run_consumer --queue celery
 
-note that atomiq will use the celery task `name` attribute to import and call the task. By default, celery sets The task name to be the `path.to.task.module.task_function_name`. Overriding the name of a task will cause atomiq to break, so plz don't do this.
+note that atomiq will use the celery task `name` attribute to import and call the task. By default, celery sets the task name to be the `path.to.task.module.task_function_name`. Overriding the name of a task will cause atomiq to break, so plz don't do this.
 
 To make sure we're not holding on to successfully executed or deleted tasks we also have a clean up management command, that by default will clean up all processed tasks that are older than 30 days. That default can be overriden.
 
