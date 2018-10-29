@@ -86,4 +86,4 @@ class ProcessTasksTest(TestCase):
             mock.call('one', 2, False, test=True),
             mock.call(3, 'two', True, test='Hello'),
         ]
-        celery_app.tasks['test_task'].delay.assert_has_calls(celery_calls)
+        test_task.delay.assert_has_calls(celery_calls)
