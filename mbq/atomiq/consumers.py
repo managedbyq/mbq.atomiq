@@ -92,11 +92,8 @@ class SQSConsumer(BaseConsumer):
 class CeleryConsumer(BaseConsumer):
     model = models.CeleryTask
     queue_type = constants.QueueType.CELERY
-    celery_app = None
-
-    def __init__(self, celery_app):
-        self.celery_app = importlib.import_module(celery_app).celery_app
 
     def publish(self, task):
-        celery_task = self.celery_app.tasks[task.task_name]
+        module_name, func_name = task.name.rsplit('.', 1)
+        celery_task = importlib.import_module(module_name).getattr(func_name)
         celery_task.delay(*task.task_arguments['args'], **task.task_arguments['kwargs'])
