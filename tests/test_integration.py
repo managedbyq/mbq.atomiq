@@ -69,16 +69,18 @@ class ProcessTasksTest(TestCase):
         ]
         sqs_client.send_message.assert_has_calls(sqs_calls)
 
-    @mock.patch.dict(celery_app.tasks, {'test_task': mock.MagicMock()})
-    def test_celery_task_runs(self):
+    @mock.patch('importlib.import_module')
+    def test_celery_task_runs(self, import_module):
         test_task = mock.MagicMock()
         test_task.name = 'test_task'
+
+        import_module.return_value = MagicMock(test_task=test_task)
 
         with transaction.atomic():
             mbq.atomiq.celery_publish(test_task, 'one', 2, False, test=True)
             mbq.atomiq.celery_publish(test_task, 3, 'two', True, test='Hello')
 
-        call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
+        call_command('atomic_run_consumer', '--queue=celery')
 
         celery_calls = [
             mock.call('one', 2, False, test=True),
