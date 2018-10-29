@@ -74,7 +74,7 @@ class ProcessTasksTest(TestCase):
         test_task = mock.MagicMock()
         test_task.name = 'test_task'
 
-        import_module.return_value = MagicMock(test_task=test_task)
+        import_module.return_value = mock.MagicMock(test_task=test_task)
 
         with transaction.atomic():
             mbq.atomiq.celery_publish(test_task, 'one', 2, False, test=True)
