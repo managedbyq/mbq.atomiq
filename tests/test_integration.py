@@ -6,7 +6,6 @@ from django.db import transaction
 from django.test import TestCase
 
 import mbq.atomiq
-from tests.celery import celery_app
 
 
 class ProcessTasksTest(TestCase):
@@ -69,19 +68,23 @@ class ProcessTasksTest(TestCase):
         ]
         sqs_client.send_message.assert_has_calls(sqs_calls)
 
-    @mock.patch.dict(celery_app.tasks, {'test_task': mock.MagicMock()})
-    def test_celery_task_runs(self):
+    @mock.patch('importlib.import_module')
+    def test_celery_task_runs(self, import_module):
         test_task = mock.MagicMock()
-        test_task.name = 'test_task'
+        test_task.name = 'task_module.test_task'
+
+        import_module.return_value = mock.MagicMock(test_task=test_task)
 
         with transaction.atomic():
             mbq.atomiq.celery_publish(test_task, 'one', 2, False, test=True)
             mbq.atomiq.celery_publish(test_task, 3, 'two', True, test='Hello')
 
-        call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
+        call_command('atomic_run_consumer', '--queue=celery')
+
+        import_module.assert_called_with('task_module')
 
         celery_calls = [
             mock.call('one', 2, False, test=True),
             mock.call(3, 'two', True, test='Hello'),
         ]
-        celery_app.tasks['test_task'].delay.assert_has_calls(celery_calls)
+        test_task.delay.assert_has_calls(celery_calls)

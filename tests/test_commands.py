@@ -31,7 +31,7 @@ class RunConsumerCommandTest(TestCase):
     def test_run_consumer_celery(self, process_one_task, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
         process_one_task.return_value = models.SNSTask.objects.create()
-        call_command('atomic_run_consumer', '--queue=celery', '--celery-app=tests.celery')
+        call_command('atomic_run_consumer', '--queue=celery')
         self.assertEqual(process_one_task.call_count, 2)
 
     @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.sleep')

@@ -42,7 +42,6 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         queue_type_choices = [c[0] for c in constants.QueueType.CHOICES]
         parser.add_argument('--queue', required=True, choices=queue_type_choices)
-        parser.add_argument('--celery-app', required=False)
 
     def cleanup_old_tasks(self, queue_type):
         days_to_keep_old_tasks = constants.DEFAULT_DAYS_TO_KEEP_OLD_TASKS
@@ -109,12 +108,7 @@ class Command(BaseCommand):
         queue_type = options['queue']
 
         Consumer = self.consumers[queue_type]
-
-        consumer_kwargs = {}
-        if queue_type == constants.QueueType.CELERY:
-            consumer_kwargs['celery_app'] = options['celery_app']
-
-        consumer = Consumer(**consumer_kwargs)
+        consumer = Consumer()
 
         while self.signal_handler.should_continue():
             try:

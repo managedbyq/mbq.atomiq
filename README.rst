@@ -43,13 +43,9 @@ Getting started
 
     python -m manage atomic_run_consumer --queue sqs
 
-    python -m manage atomic_run_consumer --queue celery --celery-app path.to.celery.app
+    python -m manage atomic_run_consumer --queue celery
 
-notice that celery consumer requires an additional arg `celery-app`. This should be a module path to the file that instantializes celery app like so:
-
-.. code-block:: python
-
-    celery_app = Celery(NAME)
+note that atomiq will use the celery task `name` attribute to import and call the task. By default, celery sets the task name to be the `path.to.task.module.task_function_name`. Overriding the name of a task will cause atomiq to break, so plz don't do this.
 
 To make sure we're not holding on to successfully executed or deleted tasks we also have a clean up management command, that by default will clean up all processed tasks that are older than 30 days. That default can be overriden.
 
@@ -92,7 +88,7 @@ We now use `tox` for local testing across multiple python environments. Before t
     $ docker-compose up py36|py27|py37|pypy3
 Testing in Other Services
 -------------------------
-When using atomiq in other services, we don't want to mock out atomiq's publish functions. This is because atomiq includes functionality to check that all usages are wrapped in a transaction, and can account for transactions added by Django in test cases. To allow you to test that the tasks you expect have been added the queue, we expose a `test_utils` module. 
+When using atomiq in other services, we don't want to mock out atomiq's publish functions. This is because atomiq includes functionality to check that all usages are wrapped in a transaction, and can account for transactions added by Django in test cases. To allow you to test that the tasks you expect have been added the queue, we expose a `test_utils` module.
 
 
 Shipping a New Release
