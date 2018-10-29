@@ -94,6 +94,6 @@ class CeleryConsumer(BaseConsumer):
     queue_type = constants.QueueType.CELERY
 
     def publish(self, task):
-        module_name, func_name = task.name.rsplit('.', 1)
-        celery_task = importlib.import_module(module_name).getattr(func_name)
+        module_name, func_name = task.task_name.rsplit('.', 1)
+        celery_task = getattr(importlib.import_module(module_name), func_name)
         celery_task.delay(*task.task_arguments['args'], **task.task_arguments['kwargs'])

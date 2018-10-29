@@ -72,7 +72,7 @@ class ProcessTasksTest(TestCase):
     @mock.patch('importlib.import_module')
     def test_celery_task_runs(self, import_module):
         test_task = mock.MagicMock()
-        test_task.name = 'test_task'
+        test_task.name = 'task_module.test_task'
 
         import_module.return_value = mock.MagicMock(test_task=test_task)
 
@@ -81,6 +81,8 @@ class ProcessTasksTest(TestCase):
             mbq.atomiq.celery_publish(test_task, 3, 'two', True, test='Hello')
 
         call_command('atomic_run_consumer', '--queue=celery')
+
+        import_module.assert_called_with('task_module')
 
         celery_calls = [
             mock.call('one', 2, False, test=True),
