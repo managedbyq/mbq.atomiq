@@ -26,7 +26,7 @@ def get_sqs_publish_payloads(queue_url):
 
 
 def reset_celery_publishes(task):
-    tasks = models.CeleryTask.objects.filter(
+    models.CeleryTask.objects.filter(
         state=constants.TaskStates.ENQUEUED,
         task_name=task.name,
     ).delete()
