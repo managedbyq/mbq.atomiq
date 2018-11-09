@@ -48,6 +48,11 @@ class CeleryTestUtilsTest(TestCase):
         celery_publish_args = test_utils.get_celery_publish_args(nonexistant_task)
         self.assertEquals(celery_publish_args, [])
 
+    def test_reset_celery_tasks(self):
+        test_utils.reset_celery_publishes(self.task)
+        celery_publish_args = test_utils.get_celery_publish_args(self.task)
+        self.assertEquals(celery_publish_args, [])
+
 
 class SNSTestUtilsTest(TestCase):
 
