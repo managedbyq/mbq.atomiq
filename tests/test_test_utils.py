@@ -88,7 +88,7 @@ class SNSTestUtilsTest(TestCase):
     def test_reset(self):
         test_utils.reset_sns_publishes('topic_arn')
         sns_publish_payloads = test_utils.get_sns_publish_payloads('topic_arn')
-        self.assertEquals(sns_publish_payloads, []])
+        self.assertEquals(sns_publish_payloads, [])
 
 
 class SQSTestUtilsTest(TestCase):
