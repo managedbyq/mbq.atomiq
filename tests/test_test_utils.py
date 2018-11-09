@@ -85,6 +85,11 @@ class SNSTestUtilsTest(TestCase):
         sns_publish_payloads = test_utils.get_sns_publish_payloads('nonexist_topic')
         self.assertEquals(sns_publish_payloads, [])
 
+    def test_reset(self):
+        test_utils.reset_sns_publishes('topic_arn')
+        sns_publish_payloads = test_utils.get_sns_publish_payloads('topic_arn')
+        self.assertEquals(sns_publish_payloads, []])
+
 
 class SQSTestUtilsTest(TestCase):
 
@@ -115,4 +120,9 @@ class SQSTestUtilsTest(TestCase):
 
     def test_get_non_existant_queue(self):
         sqs_publish_payloads = test_utils.get_sqs_publish_payloads('nonexist_queue')
+        self.assertEquals(sqs_publish_payloads, [])
+
+    def test_reset(self):
+        test_utils.reset_sqs_publishes('queue_url')
+        sqs_publish_payloads = test_utils.get_sqs_publish_payloads('queue_url')
         self.assertEquals(sqs_publish_payloads, [])
