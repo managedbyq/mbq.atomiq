@@ -1,4 +1,6 @@
+---
 sudo: false
+dist: xenial
 language: python
 cache: pip
 
@@ -8,7 +10,7 @@ services:
 
 python:
   - '3.6'
-  - '3.7-dev'
+  - '3.7'
 
 env:
   matrix:
@@ -22,7 +24,7 @@ env:
 matrix:
   fast_finish: true
   include:
-    - { python: '3.6', env: TOXENV=lint }
+    - {python: '3.6', env: TOXENV=lint}
 
 before_install:
   - mysql -e 'CREATE DATABASE atomiqdb;'
@@ -48,8 +50,7 @@ deploy:
     tags: true
     python: '3.6'
     # admittedly, this condition is a bit silly but we want the deploy to happen
-    # on exactly one build, not all py36 builds, and looking for django 1.11 is a cheap
-    # way to accomplish that.
-    condition: $DJANGO = '1.11'
-    condition: $DB = 'postgres'
+    # on exactly one build, not all py36 builds, and looking for django 1.11 is
+    # a cheap way to accomplish that.
+    condition: $DJANGO = '1.11' && $DB = 'postgres'
     distributions: sdist bdist_wheel

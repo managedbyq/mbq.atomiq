@@ -46,7 +46,7 @@ services:
     volumes:
       - .:/app
     links:
-       - postgres
+      - postgres
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py36
@@ -61,7 +61,7 @@ services:
     volumes:
       - .:/app
     links:
-       - postgres
+      - postgres
     environment:
       TOX_WORK_DIR: /tox
       PYTHON_VERSION: py37
@@ -72,7 +72,3 @@ services:
     image: postgres:9.6.8
     environment:
       POSTGRES_DB: atomiq-pg
-
-
-
-
