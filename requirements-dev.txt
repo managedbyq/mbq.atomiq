@@ -2,5 +2,5 @@ boto==2.49.0
 boto3==1.9.73
 celery<5.0
 dj-database-url==0.5.0
-freezegun
+freezegun==0.3.11
 rollbar
