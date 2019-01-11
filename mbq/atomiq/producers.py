@@ -63,7 +63,7 @@ class BaseProducer(object):
         self._dependencies_check()
         self._transaction_check()
         task = self._create_task(*args, **kwargs)
-        logger.info('task created: {task_id}'.format(task_id=task.uuid))
+        logger.debug('task created: {task_id}'.format(task_id=task.uuid))
 
     def _create_task(self, *args, **kwargs):
         raise NotImplementedError('create_task must be implemented by producer subclasses.')
