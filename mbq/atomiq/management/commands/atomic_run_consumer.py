@@ -5,7 +5,6 @@ from time import sleep
 from django.core.management.base import BaseCommand
 
 import arrow
-
 import rollbar
 
 from ... import _collector, constants, consumers, exceptions, utils
@@ -78,6 +77,17 @@ class Command(BaseCommand):
             'result': 'success' if task.state == constants.TaskStates.SUCCEEDED else 'error',
             'queue_type': queue,
         }
+
+        # `task` can be a `SNSTask`, `SQSTask`, or `CeleryTask`; duck type `task` to determine
+        # which of these models it is
+        if hasattr(task, 'topic_arn'):
+            tags['sns_topic'] = task.topic_arn.split(':')[-1]
+
+        if hasattr(task, 'queue_url'):
+            tags['sqs_queue'] = task.queue_url.split('/')[-1]
+
+        if hasattr(task, 'task_name'):
+            tags['celery_task'] = task.task_name
 
         _collector.increment(
             'task',

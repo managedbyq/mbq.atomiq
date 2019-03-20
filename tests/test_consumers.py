@@ -3,11 +3,11 @@ from unittest import mock
 from django.test import TestCase
 
 import arrow
+import freezegun
+
 from mbq.atomiq import consumers
 from mbq.atomiq.constants import MAX_ATTEMPTS_TO_PROCESS_TASKS, TaskStates
 from mbq.atomiq.models import SNSTask
-
-import freezegun
 
 
 @mock.patch('mbq.atomiq.consumers.SNSConsumer.publish')

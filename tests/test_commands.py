@@ -4,10 +4,14 @@ from django.core.management import call_command
 from django.test import TestCase
 
 import arrow
+import freezegun
+
 from mbq.atomiq import constants, exceptions, models
 from mbq.atomiq.management.commands import atomic_run_consumer
 
-import freezegun
+
+SNS_TOPIC_ARN = 'arn:aws:sns:us-east-1:878712717934:mbq-order-updates-prd'
+SNS_TOPIC = 'mbq-order-updates-prd'
 
 
 @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.SignalHandler')
@@ -128,12 +132,14 @@ class CollectMetricsTest(TestCase):
         task = models.SNSTask.objects.create(
             state=constants.TaskStates.SUCCEEDED,
             visible_after=arrow.utcnow().shift(seconds=0.012).datetime,
-            succeeded_at=arrow.utcnow().shift(seconds=0.471).datetime
+            succeeded_at=arrow.utcnow().shift(seconds=0.471).datetime,
+            topic_arn=SNS_TOPIC_ARN,
         )
         expected_tags = {
             'end_state': constants.TaskStates.SUCCEEDED,
             'result': 'success',
             'queue_type': constants.QueueType.SNS,
+            'sns_topic': SNS_TOPIC,
         }
 
         execution_started_at = arrow.utcnow().shift(seconds=0.123).datetime
@@ -177,11 +183,13 @@ class CollectMetricsTest(TestCase):
 
         task = models.SNSTask.objects.create(
             visible_after=arrow.utcnow().shift(seconds=0.012).datetime,
+            topic_arn=SNS_TOPIC_ARN
         )
         expected_tags = {
             'end_state': constants.TaskStates.ENQUEUED,
             'result': 'error',
             'queue_type': 'sns',
+            'sns_topic': SNS_TOPIC,
         }
 
         execution_started_at = arrow.utcnow().shift(seconds=0.123).datetime
