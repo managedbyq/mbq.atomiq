@@ -3,9 +3,9 @@ from unittest import mock
 from django.test import TestCase
 
 import arrow
-from mbq.atomiq import utils
-
 import freezegun
+
+from mbq.atomiq import utils
 
 
 class UtilsTest(TestCase):
