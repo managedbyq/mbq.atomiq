@@ -2,5 +2,9 @@ boto
 boto3
 celery<5.0
 dj-database-url
+flake8-isort>=2.7,<2.8
+flake8>=3.7,<3.8
 freezegun
+isort>=4.3,<4.4
+mypy-mypyc
 rollbar

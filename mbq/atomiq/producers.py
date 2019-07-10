@@ -1,6 +1,7 @@
 import importlib
 import logging
 import sys
+import typing
 
 from django.db import transaction
 
@@ -14,7 +15,7 @@ RUNNING_TESTS = any('test' in arg for arg in sys.argv)
 
 
 class BaseProducer(object):
-    required_dependencies = []
+    required_dependencies: typing.List[str] = []
     _dependencies_confirmed = False
 
     def _dependencies_check(self):
@@ -59,7 +60,7 @@ class BaseProducer(object):
                 'Atomic publish needs to happen within a db transaction.'
             )
 
-    def publish(self, *args, **kwargs):
+    def publish(self, *args, **kwargs) -> None:
         self._dependencies_check()
         self._transaction_check()
         task = self._create_task(*args, **kwargs)

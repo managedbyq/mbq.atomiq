@@ -1,3 +1,3 @@
 arrow
 jsonfield
-mbq.metrics
+mbq.metrics>=1,<2

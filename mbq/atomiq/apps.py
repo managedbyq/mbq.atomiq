@@ -8,7 +8,7 @@ class AtomiqConfig(AppConfig):
     def ready(self):
         from django.conf import settings
         from django.core.exceptions import ImproperlyConfigured
-        import mbq.metrics
+        from mbq import metrics
         from . import producers
 
         service = settings.ATOMIQ.get('service')
@@ -27,7 +27,7 @@ class AtomiqConfig(AppConfig):
                 'in your Django settings.'
             )
 
-        self.module._collector = mbq.metrics.Collector(
+        self.module._collector = metrics.Collector(
             namespace='mbq.atomiq',
             tags={'env': env, 'service': service, 'atomiq_service_name': service},
         )

@@ -36,11 +36,12 @@ setuptools.setup(
         'Topic :: Software Development :: Libraries',
     ],
     keywords='',
+    package_data={"mbq.atomiq": ["py.typed", "*.pyi"]},
     packages=setuptools.find_packages(),
     install_requires=[
         'arrow',
         'jsonfield',
-        'mbq.metrics',
+        'mbq.metrics>=1,<2',
     ],
-    zip_safe=True,
+    zip_safe=False,
 )
