@@ -136,41 +136,6 @@ def get_name_from_queue_url(url):
     return url.split('/')[-1]
 
 
-class SQSTopicListFilter(admin.SimpleListFilter):
-    title = 'queue'
-    parameter_name = 'queue_url'
-
-    def lookups(self, request, model_admin):
-        qs = model_admin.get_queryset(request).order_by('queue_url')
-        queue_urls = qs.values_list('queue_url', flat=True).distinct()
-        for url in queue_urls:
-            yield (url, get_name_from_queue_url(url))
-
-    def queryset(self, request, queryset):
-        if self.value():
-            return queryset.filter(queue_url=self.value())
-        return queryset
-
-
-class SQSTaskAdmin(BaseTaskAdmin):
-    model = models.SQSTask
-
-    def admin_queue(self, task):
-        return get_name_from_queue_url(task.queue_url)
-
-    admin_queue.short_description = 'queue'
-
-    def admin_payload(self, task):
-        return format_html('<br/><pre>{}</pre>', json.dumps(task.payload, indent=4))
-
-    admin_payload.short_description = 'payload'
-
-    list_display = BaseTaskAdmin.list_display + ('admin_queue', )
-    list_filter = (SQSTopicListFilter, )
-    fields = BaseTaskAdmin.fields + ('queue_url', 'admin_payload')
-    readonly_fields = BaseTaskAdmin.readonly_fields + ('admin_payload', )
-
-
 class CeleryTaskAdmin(BaseTaskAdmin):
     model = models.CeleryTask
 
@@ -186,5 +151,4 @@ class CeleryTaskAdmin(BaseTaskAdmin):
 
 
 admin.site.register(models.SNSTask, SNSTaskAdmin)
-admin.site.register(models.SQSTask, SQSTaskAdmin)
 admin.site.register(models.CeleryTask, CeleryTaskAdmin)

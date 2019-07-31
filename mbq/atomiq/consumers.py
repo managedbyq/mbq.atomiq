@@ -71,24 +71,6 @@ class SNSConsumer(BaseConsumer):
         )
 
 
-class SQSConsumer(BaseConsumer):
-    model = models.SQSTask
-    queue_type = constants.QueueType.SQS
-    sqs_client = None
-
-    def __init__(self):
-        import boto3
-        self.sqs_client = boto3.client('sqs')
-
-    def publish(self, task):
-        self.sqs_client.send_message(
-            QueueUrl=task.queue_url,
-            MessageBody=json.dumps({
-                'Message': json.dumps(task.payload),
-            })
-        )
-
-
 class CeleryConsumer(BaseConsumer):
     model = models.CeleryTask
     queue_type = constants.QueueType.CELERY

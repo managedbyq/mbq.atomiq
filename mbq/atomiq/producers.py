@@ -90,26 +90,6 @@ class SNSProducer(BaseProducer):
         )
 
 
-class SQSProducer(BaseProducer):
-    required_dependencies = ['boto3']
-
-    def _create_task(self, queue_url, payload):
-        if not isinstance(queue_url, str):
-            raise ValueError(
-                'Atomiq SQS publish expects a string "queue_url" argument.'
-                'Got {}'.format(queue_url)
-            )
-        if not payload:
-            raise ValueError(
-                'Atomiq SQS publish expects a non-empty "payload" argument.'
-            )
-
-        return models.SQSTask.objects.create(
-            queue_url=queue_url,
-            payload=payload,
-        )
-
-
 class CeleryProducer(BaseProducer):
     required_dependencies = ['celery']
 

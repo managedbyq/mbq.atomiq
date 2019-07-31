@@ -34,7 +34,5 @@ class AtomiqConfig(AppConfig):
 
         sns_producer = producers.SNSProducer()
         self.module.sns_publish = sns_producer.publish
-        sqs_producer = producers.SQSProducer()
-        self.module.sqs_publish = sqs_producer.publish
         celery_producer = producers.CeleryProducer()
         self.module.celery_publish = celery_producer.publish

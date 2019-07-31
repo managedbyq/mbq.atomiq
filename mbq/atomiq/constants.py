@@ -14,12 +14,10 @@ class TaskStates(object):
 
 class QueueType(object):
     SNS = 'sns'
-    SQS = 'sqs'
     CELERY = 'celery'
 
     CHOICES = (
         (SNS, 'SNS'),
-        (SQS, 'SQS'),
         (CELERY, 'Celery'),
     )
 

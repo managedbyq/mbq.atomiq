@@ -41,8 +41,6 @@ Getting started
 
     python -m manage atomic_run_consumer --queue sns
 
-    python -m manage atomic_run_consumer --queue sqs
-
     python -m manage atomic_run_consumer --queue celery
 
 Note that atomiq will use the celery task ``name`` attribute to import and call the task. By default, celery sets the task name to be the ``path.to.task.module.task_function_name``. Overriding the name of a task will cause atomiq to break, so plz don't do this.
@@ -68,8 +66,6 @@ To make sure we're not holding on to successfully executed or deleted tasks we a
     import mbq.atomiq
 
     mbq.atomiq.sns_publish(topic_arn, message)
-
-    mbq.atomiq.sqs_publish(queue_url, message)
 
     mbq.atomiq.celery_publish(celery_task, *task_args, **task_kwargs)
 

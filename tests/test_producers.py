@@ -110,61 +110,6 @@ class SNSProducerTest(TestCase):
                 mbq.atomiq.sns_publish('topic_arn', {})
 
 
-class SQSProducerTest(TestCase):
-    def test_outside_of_transaction(self):
-        with self.assertRaises(exceptions.TransactionError):
-            mbq.atomiq.sqs_publish('queue_url', {'payload': 'payload'})
-
-    def test_non_json_serializable_payload(self):
-        bad_payload = {
-            'arrow_obj': arrow.utcnow(),
-        }
-
-        with self.assertRaises(TypeError):
-            with transaction.atomic():
-                mbq.atomiq.sqs_publish('queue_url', bad_payload)
-
-    def test_message_enqueued(self):
-        unique_queue_url = str(uuid.uuid4())
-        payload = {'payload': 'payload'}
-        with transaction.atomic():
-            mbq.atomiq.sqs_publish(unique_queue_url, payload)
-
-        created_task = models.SQSTask.objects.get(queue_url=unique_queue_url)
-        self.assertEqual(created_task.number_of_attempts, 0)
-        self.assertIsNotNone(created_task.visible_after)
-        self.assertIsNone(created_task.succeeded_at)
-        self.assertIsNone(created_task.deleted_at)
-        self.assertIsNone(created_task.failed_at)
-        self.assertEqual(created_task.state, constants.TaskStates.ENQUEUED)
-        self.assertEqual(created_task.payload, payload)
-
-    def test_unicode_payload(self):
-        unicode_payload = {'value': u'\u2EE5'}
-
-        with transaction.atomic():
-            mbq.atomiq.sqs_publish('queue_url', unicode_payload)
-
-        task = models.SQSTask.objects.get(queue_url='queue_url')
-        payload = task.payload
-        self.assertEquals(payload, unicode_payload)
-
-    def test_parameter_validation(self):
-        payload = {'payload': 'payload'}
-        with transaction.atomic():
-            with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish(None, payload)
-
-            with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('queue_arn', None)
-
-            with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('queue_arn', [])
-
-            with self.assertRaises(ValueError):
-                mbq.atomiq.sqs_publish('queue_arn', {})
-
-
 class CeleryProducerTest(TestCase):
     @classmethod
     def setUpTestData(cls):

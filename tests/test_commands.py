@@ -24,13 +24,6 @@ class RunConsumerCommandTest(TestCase):
         call_command('atomic_run_consumer', '--queue=sns')
         self.assertEqual(process_one_task.call_count, 2)
 
-    @mock.patch('mbq.atomiq.consumers.SQSConsumer.process_one_task')
-    def test_run_consumer_sqs(self, process_one_task, SignalHandlerMock):
-        SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
-        process_one_task.return_value = models.SNSTask.objects.create()
-        call_command('atomic_run_consumer', '--queue=sqs')
-        self.assertEqual(process_one_task.call_count, 2)
-
     @mock.patch('mbq.atomiq.consumers.CeleryConsumer.process_one_task')
     def test_run_consumer_celery(self, process_one_task, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, True, False]
@@ -43,7 +36,7 @@ class RunConsumerCommandTest(TestCase):
     def test_sleeps_when_queue_is_empty(self, process_task, sleep, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, False]
         process_task.side_effect = exceptions.NoAvailableTasksToProcess
-        call_command('atomic_run_consumer', '--queue=sqs')
+        call_command('atomic_run_consumer', '--queue=sns')
         self.assertEqual(sleep.call_count, 1)
 
     @mock.patch('mbq.atomiq.management.commands.atomic_run_consumer.sleep')
@@ -51,7 +44,7 @@ class RunConsumerCommandTest(TestCase):
     def test_sleeps_on_unexpected_error(self, process_task, sleep, SignalHandlerMock):
         SignalHandlerMock.return_value.should_continue.side_effect = [True, False]
         process_task.side_effect = Exception
-        call_command('atomic_run_consumer', '--queue=sqs')
+        call_command('atomic_run_consumer', '--queue=sns')
         self.assertEqual(sleep.call_count, 1)
 
 
