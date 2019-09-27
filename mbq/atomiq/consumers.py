@@ -2,6 +2,7 @@ import importlib
 import json
 import traceback
 
+from django.conf import settings
 from django.db import transaction
 
 import arrow
@@ -59,7 +60,7 @@ class SNSConsumer(BaseConsumer):
 
     def __init__(self):
         import boto3
-        self.sns_client = boto3.client('sns')
+        self.sns_client = boto3.client('sns', endpoint_url=settings.ATOMIQ.get('SNS_ENDPOINT'))
 
     def publish(self, task):
         self.sns_client.publish(

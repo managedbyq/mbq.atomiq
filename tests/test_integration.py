@@ -29,7 +29,7 @@ class ProcessTasksTest(TestCase):
 
         call_command('atomic_run_consumer', '--queue=sns')
 
-        boto_client.assert_called_once_with('sns')
+        boto_client.assert_called_once_with('sns', endpoint_url=None)
         sns_calls = [
             mock.call(
                 TargetArn='topic_arn1',
